@@ -1,0 +1,1794 @@
+(undo-tree-save-format-version . 1)
+"71fe13845f9e21be718384bea17a87ff0cf18600"
+[nil nil nil nil (26677 64077 637228 435000) 0 nil]
+([nil nil ((#(";;;;CODE FROM CHAPTER 1 OF STRUCTURE AND INTERPRETATION OF COMPUTER PROGRAMS
+
+;;; Examples from the book are commented out with ;: so that they
+;;;  are easy to find and so that they will be omitted if you evaluate a
+;;;  chunk of the file (programs with intervening examples) in Scheme.
+
+;;; BEWARE: Although the whole file can be loaded into Scheme,
+;;;  don't expect the programs to work if you do so.  For example,
+;;;  the redefinition of + in exercise 1.9 wreaks havoc with the
+;;;  last version of square defined here.
+
+
+;;;SECTION 1.1.1
+
+;; interpreter examples
+
+ 486
+
+ ((+ 137 349) 
+ (- 1000 334)
+ (* 5 99)
+ (/ 10 5)  
+ (+ 2.7 10)  ) 
+;: (+ 21 35 12 7)
+;: (* 25 4 12)
+
+;: (+ (* 3 5) (- 10 6))
+
+;: (+ (* 3 (+ (* 2 4) (+ 3 5))) (+ (- 10 7) 6))
+
+;: (+ (* 3
+;:       (+ (* 2 4)
+;:          (+ 3 5)))
+;:    (+ (- 10 7)
+;:       6))
+
+
+;;;SECTION 1.1.2
+
+;: (define size 2)
+;: size
+;: (* 5 size)
+
+;: (define pi 3.14159)
+;: (define radius 10)
+;: (* pi (* radius radius))
+;: (define circumference (* 2 pi radius))
+;: circumference
+
+
+;;;SECTION 1.1.3
+
+;: (* (+ 2 (* 4 6))
+;:    (+ 3 5 7))
+
+
+;;;SECTION 1.1.4
+
+(define (square x) (* x x)) 
+
+
+;: (square 21)
+;: (square (+ 2 5))
+;: (square (square 3))
+
+(define (sum-of-squares x y)
+  (+ (square x) (square y))) 
+
+;: (sum-of-squares 3 4)
+
+(define (f a)
+  (sum-of-squares (+ a 1) (* a 2)))
+
+ (f 5)
+
+
+;;;SECTION 1.1.5
+
+;: (f 5)
+;: (sum-of-squares (+ 5 1) (* 5 2))
+;: (+ (square 6) (square 10))
+;: (+ (* 6 6) (* 10 10))
+;: (+ 36 100)
+
+;: (f 5)
+;: (sum-of-squares (+ 5 1) (* 5 2))
+;: (+    (square (+ 5 1))      (square (* 5 2))  )
+;: (+    (* (+ 5 1) (+ 5 1))   (* (* 5 2) (* 5 2)))
+;: (+         (* 6 6)             (* 10 10))
+;: (+           36                   100)
+;:                     136
+
+
+;;;SECTION 1.1.6
+
+(define (abs x)
+  (cond ((> x 0) x)
+        ((= x 0) 0)
+        ((< x 0) (- x))))
+
+(define (abs x)
+  (cond ((< x 0) (- x))
+        (else x)))
+
+(define (abs x)
+  (if (< x 0)
+      (- x)
+      x))
+
+;: (and (> x 5) (< x 10))
+
+(define (>= x y)
+  (or (> x y) (= x y)))
+
+(define (>= x y)
+  (not (< x y)))
+
+
+;;EXERCISE 1.1
+;: 10
+
+;: (+ 5 3 4)
+
+;: (- 9 1)
+
+;: (/ 6 2)
+
+;: (+ (* 2 4) (- 4 6))
+
+;: (define a 3)
+
+;: (define b (+ a 1))
+
+;: (+ a b (* a b))
+
+;: (= a b)
+
+;: (if (and (> b a) (< b (* a b)))
+;:     b
+;:     a)
+
+;: (cond ((= a 4) 6)
+;:       ((= b 4) (+ 6 7 a))
+;:       (else 25))
+
+;: (+ 2 (if (> b a) b a))
+
+;: (* (cond ((> a b) a)
+;: 	 ((< a b) b)
+;: 	 (else -1))
+;:    (+ a 1))
+
+;;EXERCISE 1.4
+(define (a-plus-abs-b a b)
+  ((if (> b 0) + -) a b))
+
+;;EXERCISE 1.5
+(define (p) (p))
+
+(define (test x y)
+  (if (= x 0)
+      0
+      y))
+
+;: (test 0 (p))
+
+
+;;;SECTION 1.1.7
+
+(define (sqrt-iter guess x)
+  (if (good-enough? guess x)
+      guess
+      (sqrt-iter (improve guess x)
+                 x)))
+
+
+(define (sqrt-iter-2 guess x precision)
+  (define iter 0)
+  (define gues-prev guess)
+  (if (not (eq iter 0))
+    (if (good-enough? guess x)
+      guess
+      (sqrt-iter (improve guess x)
+                 x))
+    (sqrt-iter (improve guess x)
+               x)
+    ) 
+  )
+
+
+(define (improve guess x)
+  (average guess (/ x guess)))
+
+(define (average x y)
+  (/ (+ x y) 2))
+
+(define (good-enough? guess x)
+  (< (abs (- (square guess) x)) 0.001))
+
+(define (sqrt x)
+  (sqrt-iter 1.0 x))
+
+
+;: (sqrt 9)
+;: (sqrt (+ 100 37))
+;: (sqrt (+ (sqrt 2) (sqrt 3)))
+;: (square (sqrt 1000))
+
+
+;;EXERCISE 1.6
+(define (new-if predicate then-clause else-clause)
+  (cond (predicate then-clause)
+        (else else-clause)))
+
+;: (new-if (= 2 3) 0 5)
+
+;: (new-if (= 1 1) 0 5)
+
+(define (sqrt-iter guess x)
+  (new-if (good-enough? guess x)
+          guess
+          (sqrt-iter (improve guess x)
+                     x)))
+
+
+;;;SECTION 1.1.8
+
+(define (square x) (* x x))
+
+(define (square x) 
+  (exp (double (log x))))
+
+(define (double x) (+ x x))
+
+
+;; As in 1.1.7
+(define (sqrt x)
+  (sqrt-iter 1.0 x))
+
+(define (sqrt-iter guess x)
+  (if (good-enough? guess x)
+      guess
+      (sqrt-iter (improve guess x) x)))
+
+(define (good-enough? guess x)
+  (< (abs (- (square guess) x)) 0.001))
+
+(define (improve guess x)
+  (average guess (/ x guess)))
+
+
+;; Block-structured
+(define (sqrt x)
+  (define (good-enough? guess x)
+    (< (abs (- (square guess) x)) 0.001))
+  (define (improve guess x)
+    (average guess (/ x guess)))
+  (define (sqrt-iter guess x)
+    (if (good-enough? guess x)
+        guess
+        (sqrt-iter (improve guess x) x)))
+  (sqrt-iter 1.0 x))
+
+;; Taking advantage of lexical scoping
+(define (sqrt x)
+  (define (good-enough? guess)
+    (< (abs (- (square guess) x)) 0.001))
+  (define (improve guess)
+    (average guess (/ x guess)))
+  (define (sqrt-iter guess)
+    (if (good-enough? guess)
+        guess
+        (sqrt-iter (improve guess))))
+  (sqrt-iter 1.0))
+
+;;;SECTION 1.2.1
+
+;; Recursive
+
+(define (factorial n)
+  (if (= n 1)
+      1
+      (* n (factorial (- n 1)))))
+
+
+;; Iterative
+
+(define (factorial n)
+  (fact-iter 1 1 n))
+
+(define (fact-iter product counter max-count)
+  (if (> counter max-count)
+      product
+      (fact-iter (* counter product)
+                 (+ counter 1)
+                 max-count)))
+
+;; Iterative, block-structured (from footnote)
+(define (factorial n)
+  (define (iter product counter)
+    (if (> counter n)
+        product
+        (iter (* counter product)
+              (+ counter 1))))
+  (iter 1 1))
+
+
+;;EXERCISE 1.9
+(define (+ a b)
+  (if (= a 0)
+      b
+      (inc (+ (dec a) b))))
+
+(define (+ a b)
+  (if (= a 0)
+      b
+      (+ (dec a) (inc b))))
+
+;;EXERCISE 1.10
+(define (A x y)
+  (cond ((= y 0) 0)
+        ((= x 0) (* 2 y))
+        ((= y 1) 2)
+        (else (A (- x 1)
+                 (A x (- y 1))))))
+
+;: (A 1 10)
+
+;: (A 2 4)
+
+;: (A 3 3)
+
+(define (f n) (A 0 n))
+
+(define (g n) (A 1 n))
+
+(define (h n) (A 2 n))
+
+(define (k n) (* 5 n n))
+
+
+;;;SECTION 1.2.2
+
+;; Recursive
+
+(define (fib n)
+  (cond ((= n 0) 0)
+        ((= n 1) 1)
+        (else (+ (fib (- n 1))
+                 (fib (- n 2))))))
+
+;; Iterative
+
+(define (fib n)
+  (fib-iter 1 0 n))
+
+(define (fib-iter a b count)
+  (if (= count 0)
+      b
+      (fib-iter (+ a b) a (- count 1))))
+
+
+;; Counting change
+
+(define (count-change amount)
+  (cc amount 5))
+
+(define (cc amount kinds-of-coins)
+  (cond ((= amount 0) 1)
+        ((or (< amount 0) (= kinds-of-coins 0)) 0)
+        (else (+ (cc amount
+                     (- kinds-of-coins 1))
+                 (cc (- amount
+                        (first-denomination kinds-of-coins))
+                     kinds-of-coins)))))
+
+(define (first-denomination kinds-of-coins)
+  (cond ((= kinds-of-coins 1) 1)
+        ((= kinds-of-coins 2) 5)
+        ((= kinds-of-coins 3) 10)
+        ((= kinds-of-coins 4) 25)
+        ((= kinds-of-coins 5) 50)))
+
+;: (count-change 100)
+
+
+;;;SECTION 1.2.3
+
+;;EXERCISE 1.15
+(define (cube x) (* x x x))
+
+(define (p x) (- (* 3 x) (* 4 (cube x))))
+
+(define (sine angle)
+   (if (not (> (abs angle) 0.1))
+       angle
+       (p (sine (/ angle 3.0)))))
+
+
+;;;SECTION 1.2.4
+
+;; Linear recursion
+(define (expt b n)
+  (if (= n 0)
+      1
+      (* b (expt b (- n 1)))))
+
+
+;; Linear iteration
+(define (expt b n)
+  (expt-iter b n 1))
+
+(define (expt-iter b counter product)
+  (if (= counter 0)
+      product
+      (expt-iter b
+                (- counter 1)
+                (* b product)))) 
+
+;; Logarithmic iteration
+(define (fast-expt b n)
+  (cond ((= n 0) 1)
+        ((even? n) (square (fast-expt b (/ n 2))))
+        (else (* b (fast-expt b (- n 1))))))
+
+(define (even? n)
+  (= (remainder n 2) 0))
+
+
+;;EXERCISE 1.17
+(define (* a b)
+  (if (= b 0)
+      0
+      (+ a (* a (- b 1)))))
+
+;;EXERCISE 1.19
+(define (fib n)
+  (fib-iter 1 0 0 1 n))
+
+(define (fib-iter a b p q count)
+  (cond ((= count 0) b)
+        ((even? count)
+         (fib-iter a
+                   b
+                   ??FILL-THIS-IN?? ; compute p'
+                   ??FILL-THIS-IN?? ; compute q'
+                   (/ count 2)))
+        (else (fib-iter (+ (* b q) (* a q) (* a p))
+                        (+ (* b p) (* a q))
+                        p
+                        q
+                        (- count 1)))))
+
+
+;;;SECTION 1.2.5
+
+(define (gcd a b)
+  (if (= b 0)
+      a
+      (gcd b (remainder a b))))
+
+
+;;;SECTION 1.2.6
+
+;; prime?
+
+(define (smallest-divisor n)
+  (find-divisor n 2))
+
+(define (find-divisor n test-divisor)
+  (cond ((> (square test-divisor) n) n)
+        ((divides? test-divisor n) test-divisor)
+        (else (find-divisor n (+ test-divisor 1)))))
+
+(define (divides? a b)
+  (= (remainder b a) 0))
+
+(define (prime? n)
+  (= n (smallest-divisor n)))
+
+
+;; fast-prime?
+
+(define (expmod base exp m)
+  (cond ((= exp 0) 1)
+        ((even? exp)
+         (remainder (square (expmod base (/ exp 2) m))
+                    m))
+        (else
+         (remainder (* base (expmod base (- exp 1) m))
+                    m))))        
+
+(define (fermat-test n)
+  (define (try-it a)
+    (= (expmod a n n) a))
+  (try-it (+ 1 (random (- n 1)))))
+
+(define (fast-prime? n times)
+  (cond ((= times 0) true)
+        ((fermat-test n) (fast-prime? n (- times 1)))
+        (else false)))
+
+
+;;EXERCISE 1.22
+(define (timed-prime-test n)
+  (newline)
+  (display n)
+  (start-prime-test n (runtime)))
+
+(define (start-prime-test n start-time)
+  (if (prime? n)
+      (report-prime (- (runtime) start-time))))
+
+(define (report-prime elapsed-time)
+  (display \" *** \")
+  (display elapsed-time))
+
+;;EXERCISE 1.25
+(define (expmod base exp m)
+  (remainder (fast-expt base exp) m))
+
+;;EXERCISE 1.26
+(define (expmod base exp m)
+  (cond ((= exp 0) 1)
+        ((even? exp)
+         (remainder (* (expmod base (/ exp 2) m)
+                       (expmod base (/ exp 2) m))
+                    m))
+        (else
+         (remainder (* base (expmod base (- exp 1) m))
+                    m))))
+
+;;;SECTION 1.3
+
+(define (cube x) (* x x x))
+
+;;;SECTION 1.3.1
+
+(define (sum-integers a b)
+  (if (> a b)
+      0
+      (+ a (sum-integers (+ a 1) b))))
+
+(define (sum-cubes a b)
+  (if (> a b)
+      0
+      (+ (cube a) (sum-cubes (+ a 1) b))))
+
+(define (pi-sum a b)
+  (if (> a b)
+      0
+      (+ (/ 1.0 (* a (+ a 2))) (pi-sum (+ a 4) b))))
+
+(define (sum term a next b)
+  (if (> a b)
+      0
+      (+ (term a)
+         (sum term (next a) next b))))
+
+
+;; Using sum
+
+(define (inc n) (+ n 1))
+
+(define (sum-cubes a b)
+  (sum cube a inc b))
+
+;: (sum-cubes 1 10)
+
+
+(define (identity x) x)
+
+(define (sum-integers a b)
+  (sum identity a inc b))
+
+;: (sum-integers 1 10)
+
+
+(define (pi-sum a b)
+  (define (pi-term x)
+    (/ 1.0 (* x (+ x 2))))
+  (define (pi-next x)
+    (+ x 4))
+  (sum pi-term a pi-next b))
+
+;: (* 8 (pi-sum 1 1000))
+
+
+(define (integral f a b dx)
+  (define (add-dx x) (+ x dx))
+  (* (sum f (+ a (/ dx 2)) add-dx b)
+     dx))
+
+;: (integral cube 0 1 0.01)
+
+;: (integral cube 0 1 0.001)
+
+
+;;EXERCISE 1.32
+;: (accumulate combiner null-value term a next b)
+
+;;;SECTION 1.3.2
+
+(define (pi-sum a b)
+  (sum (lambda (x) (/ 1.0 (* x (+ x 2))))
+       a
+       (lambda (x) (+ x 4))
+       b))
+
+(define (integral f a b dx)
+  (* (sum f
+          (+ a (/ dx 2.0))
+          (lambda (x) (+ x dx))
+          b)
+     dx))
+
+(define (plus4 x) (+ x 4))
+
+(define plus4 (lambda (x) (+ x 4)))
+
+;: ((lambda (x y z) (+ x y (square z))) 1 2 3)
+
+
+;; Using let
+
+(define (f x y)
+  (define (f-helper a b)
+    (+ (* x (square a))
+       (* y b)
+       (* a b)))
+  (f-helper (+ 1 (* x y)) 
+            (- 1 y)))
+
+(define (f x y)
+  ((lambda (a b)
+     (+ (* x (square a))
+        (* y b)
+        (* a b)))
+   (+ 1 (* x y))
+   (- 1 y)))
+
+(define (f x y)
+  (let ((a (+ 1 (* x y)))
+        (b (- 1 y)))
+    (+ (* x (square a))
+       (* y b)
+       (* a b))))
+
+;: (+ (let ((x 3))
+;:      (+ x (* x 10)))
+;:    x)
+
+;: (let ((x 3)
+;:       (y (+ x 2)))
+;:   (* x y))
+
+(define (f x y)
+  (define a (+ 1 (* x y)))
+  (define b (- 1 y))
+  (+ (* x (square a))
+     (* y b)
+     (* a b)))
+
+
+;;EXERCISE 1.34
+(define (f g)
+  (g 2))
+
+;: (f square)
+
+;: (f (lambda (z) (* z (+ z 1))))
+
+
+;;;SECTION 1.3.3
+
+;; Half-interval method
+
+(define (search f neg-point pos-point)
+  (let ((midpoint (average neg-point pos-point)))
+    (if (close-enough? neg-point pos-point)
+        midpoint
+        (let ((test-value (f midpoint)))
+          (cond ((positive? test-value)
+                 (search f neg-point midpoint))
+                ((negative? test-value)
+                 (search f midpoint pos-point))
+                (else midpoint))))))
+
+(define (close-enough? x y)
+  (< (abs (- x y)) 0.001))
+
+(define (half-interval-method f a b)
+  (let ((a-value (f a))
+        (b-value (f b)))
+    (cond ((and (negative? a-value) (positive? b-value))
+           (search f a b))
+          ((and (negative? b-value) (positive? a-value))
+           (search f b a))
+          (else
+           (error \"Values are not of opposite sign\" a b)))))
+
+
+;: (half-interval-method sin 2.0 4.0)
+
+;: (half-interval-method (lambda (x) (- (* x x x) (* 2 x) 3))
+;:                       1.0
+;:                       2.0)
+
+
+;; Fixed points
+
+(define tolerance 0.00001)
+
+(define (fixed-point f first-guess)
+  (define (close-enough? v1 v2)
+    (< (abs (- v1 v2)) tolerance))
+  (define (try guess)
+    (let ((next (f guess)))
+      (if (close-enough? guess next)
+          next
+          (try next))))
+  (try first-guess))
+
+
+;: (fixed-point cos 1.0)
+
+;: (fixed-point (lambda (y) (+ (sin y) (cos y)))
+;:              1.0)
+
+
+(define (sqrt x)
+  (fixed-point (lambda (y) (/ x y))
+               1.0))
+
+(define (sqrt x)
+  (fixed-point (lambda (y) (average y (/ x y)))
+               1.0))
+
+
+;;EXERCISE 1.37
+;: (cont-frac (lambda (i) 1.0)
+;:            (lambda (i) 1.0)
+;:            k)
+
+
+;;;SECTION 1.3.4
+
+(define (average-damp f)
+  (lambda (x) (average x (f x))))
+
+;: ((average-damp square) 10)
+
+(define (sqrt x)
+  (fixed-point (average-damp (lambda (y) (/ x y)))
+               1.0))
+
+(define (cube-root x)
+  (fixed-point (average-damp (lambda (y) (/ x (square y))))
+               1.0))
+
+
+;; Newton's method
+
+(define (deriv g)
+  (lambda (x)
+    (/ (- (g (+ x dx)) (g x))
+       dx)))
+(define dx 0.00001)
+
+
+(define (cube x) (* x x x))
+
+;: ((deriv cube) 5)
+
+(define (newton-transform g)
+  (lambda (x)
+    (- x (/ (g x) ((deriv g) x)))))
+
+(define (newtons-method g guess)
+  (fixed-point (newton-transform g) guess))
+
+
+(define (sqrt x)
+  (newtons-method (lambda (y) (- (square y) x))
+                  1.0))
+
+
+;; Fixed point of transformed function
+
+(define (fixed-point-of-transform g transform guess)
+  (fixed-point (transform g) guess))
+
+(define (sqrt x)
+  (fixed-point-of-transform (lambda (y) (/ x y))
+                            average-damp
+                            1.0))
+
+(define (sqrt x)
+  (fixed-point-of-transform (lambda (y) (- (square y) x))
+                            newton-transform
+                            1.0))
+
+
+;;EXERCISE 1.40
+;: (newtons-method (cubic a b c) 1)
+
+
+;;EXERCISE 1.41
+;: (((double (double double)) inc) 5)
+
+
+;;EXERCISE 1.42
+;: ((compose square inc) 6)
+
+
+;;EXERCISE 1.43
+;: ((repeated square 2) 5)
+
+" 0 4 (face font-lock-comment-delimiter-face fontified t) 4 77 (face font-lock-comment-face fontified t) 77 78 (fontified t) 78 82 (face font-lock-comment-delimiter-face fontified t) 82 144 (face font-lock-comment-face fontified t) 144 149 (face font-lock-comment-delimiter-face fontified t) 149 217 (face font-lock-comment-face fontified t) 217 222 (face font-lock-comment-delimiter-face fontified t) 222 288 (face font-lock-comment-face fontified t) 288 289 (fontified t) 289 293 (face font-lock-comment-delimiter-face fontified t) 293 352 (face font-lock-comment-face fontified t) 352 357 (face font-lock-comment-delimiter-face fontified t) 357 419 (face font-lock-comment-face fontified t) 419 424 (face font-lock-comment-delimiter-face fontified t) 424 484 (face font-lock-comment-face fontified t) 484 489 (face font-lock-comment-delimiter-face fontified t) 489 526 (face font-lock-comment-face fontified t) 526 528 (fontified t) 528 531 (face font-lock-comment-delimiter-face fontified t) 531 545 (face font-lock-comment-face fontified t) 545 546 (fontified t) 546 549 (face font-lock-comment-delimiter-face fontified t) 549 570 (face font-lock-comment-face fontified t) 570 571 (fontified t) 571 576 (fontified t) 576 577 (fontified t) 577 606 (fontified t) 606 614 (fontified t) 614 616 (fontified t) 616 644 (fontified t) 644 645 (face font-lock-comment-delimiter-face fontified t) 645 662 (face font-lock-comment-face fontified t) 662 663 (face font-lock-comment-delimiter-face fontified t) 663 677 (face font-lock-comment-face fontified t) 677 678 (fontified t) 678 679 (face font-lock-comment-delimiter-face fontified t) 679 702 (face font-lock-comment-face fontified t) 702 703 (fontified t) 703 704 (face font-lock-comment-delimiter-face fontified t) 704 751 (face font-lock-comment-face fontified t) 751 752 (fontified t) 752 753 (face font-lock-comment-delimiter-face fontified t) 753 763 (face font-lock-comment-face fontified t) 763 764 (face font-lock-comment-delimiter-face fontified t) 764 783 (face font-lock-comment-face fontified t) 783 784 (face font-lock-comment-delimiter-face fontified t) 784 805 (face font-lock-comment-face fontified t) 805 806 (face font-lock-comment-delimiter-face fontified t) 806 823 (face font-lock-comment-face fontified t) 823 824 (face font-lock-comment-delimiter-face fontified t) 824 836 (face font-lock-comment-face fontified t) 836 838 (fontified t) 838 841 (face font-lock-comment-delimiter-face fontified t) 841 855 (face font-lock-comment-face fontified t) 855 856 (fontified t) 856 857 (face font-lock-comment-delimiter-face fontified t) 857 875 (face font-lock-comment-face fontified t) 875 876 (face font-lock-comment-delimiter-face fontified t) 876 883 (face font-lock-comment-face fontified t) 883 884 (face font-lock-comment-delimiter-face fontified t) 884 897 (face font-lock-comment-face fontified t) 897 898 (fontified t) 898 899 (face font-lock-comment-delimiter-face fontified t) 899 921 (face font-lock-comment-face fontified t) 921 922 (face font-lock-comment-delimiter-face fontified t) 922 943 (face font-lock-comment-face fontified t) 943 944 (face font-lock-comment-delimiter-face fontified t) 944 971 (face font-lock-comment-face fontified t) 971 972 (face font-lock-comment-delimiter-face fontified t) 972 1013 (face font-lock-comment-face fontified t) 1013 1014 (face font-lock-comment-delimiter-face fontified t) 1014 1030 (face font-lock-comment-face fontified t) 1030 1032 (fontified t) 1032 1035 (face font-lock-comment-delimiter-face fontified t) 1035 1049 (face font-lock-comment-face fontified t) 1049 1050 (fontified t) 1050 1051 (face font-lock-comment-delimiter-face fontified t) 1051 1070 (face font-lock-comment-face fontified t) 1070 1071 (face font-lock-comment-delimiter-face fontified t) 1071 1087 (face font-lock-comment-face fontified t) 1087 1089 (fontified t) 1089 1092 (face font-lock-comment-delimiter-face fontified t) 1092 1106 (face font-lock-comment-face fontified t) 1106 1108 (fontified t) 1108 1114 (face font-lock-keyword-face fontified t) 1114 1116 (fontified t) 1116 1122 (face font-lock-function-name-face fontified t) 1122 1138 (fontified t) 1138 1139 (face font-lock-comment-delimiter-face fontified t) 1139 1153 (face font-lock-comment-face fontified t) 1153 1154 (face font-lock-comment-delimiter-face fontified t) 1154 1173 (face font-lock-comment-face fontified t) 1173 1174 (face font-lock-comment-delimiter-face fontified t) 1174 1196 (face font-lock-comment-face fontified t) 1196 1198 (fontified t) 1198 1204 (face font-lock-keyword-face fontified t) 1204 1206 (fontified t) 1206 1220 (face font-lock-function-name-face fontified t) 1220 1257 (fontified t) 1257 1258 (face font-lock-comment-delimiter-face fontified t) 1258 1281 (face font-lock-comment-face fontified t) 1281 1283 (fontified t) 1283 1289 (face font-lock-keyword-face fontified t) 1289 1291 (fontified t) 1291 1292 (face font-lock-function-name-face fontified t) 1292 1342 (fontified t) 1342 1345 (face font-lock-comment-delimiter-face fontified t) 1345 1359 (face font-lock-comment-face fontified t) 1359 1360 (fontified t) 1360 1361 (face font-lock-comment-delimiter-face fontified t) 1361 1369 (face font-lock-comment-face fontified t) 1369 1370 (face font-lock-comment-delimiter-face fontified t) 1370 1405 (face font-lock-comment-face fontified t) 1405 1406 (face font-lock-comment-delimiter-face fontified t) 1406 1435 (face font-lock-comment-face fontified t) 1435 1436 (face font-lock-comment-delimiter-face fontified t) 1436 1460 (face font-lock-comment-face fontified t) 1460 1461 (face font-lock-comment-delimiter-face fontified t) 1461 1474 (face font-lock-comment-face fontified t) 1474 1475 (fontified t) 1475 1476 (face font-lock-comment-delimiter-face fontified t) 1476 1484 (face font-lock-comment-face fontified t) 1484 1485 (face font-lock-comment-delimiter-face fontified t) 1485 1500 (face font-lock-comment-face fontified t) 1500 1520 (face font-lock-comment-face fontified t) 1520 1521 (face font-lock-comment-delimiter-face fontified t) 1521 1571 (face font-lock-comment-face fontified t) 1571 1572 (face font-lock-comment-delimiter-face fontified t) 1572 1623 (face font-lock-comment-face fontified t) 1623 1624 (face font-lock-comment-delimiter-face fontified t) 1624 1668 (face font-lock-comment-face fontified t) 1668 1669 (face font-lock-comment-delimiter-face fontified t) 1669 1710 (face font-lock-comment-face fontified t) 1710 1711 (face font-lock-comment-delimiter-face fontified t) 1711 1737 (face font-lock-comment-face fontified t) 1737 1739 (fontified t) 1739 1742 (face font-lock-comment-delimiter-face fontified t) 1742 1756 (face font-lock-comment-face fontified t) 1756 1758 (fontified t) 1758 1764 (face font-lock-keyword-face fontified t) 1764 1766 (fontified t) 1766 1769 (face font-lock-function-name-face fontified t) 1769 1776 (fontified t) 1776 1780 (face font-lock-keyword-face fontified t) 1780 1841 (fontified t) 1841 1847 (face font-lock-keyword-face fontified t) 1847 1849 (fontified t) 1849 1852 (face font-lock-function-name-face fontified t) 1852 1859 (fontified t) 1859 1863 (face font-lock-keyword-face fontified t) 1863 1889 (fontified t) 1889 1893 (face font-lock-keyword-face fontified t) 1893 1901 (fontified t) 1901 1907 (face font-lock-keyword-face fontified t) 1907 1909 (fontified t) 1909 1912 (face font-lock-function-name-face fontified t) 1912 1919 (fontified t) 1919 1921 (face font-lock-keyword-face fontified t) 1921 1953 (fontified t) 1953 1954 (face font-lock-comment-delimiter-face fontified t) 1954 1979 (face font-lock-comment-face fontified t) 1979 1981 (fontified t) 1981 1987 (face font-lock-keyword-face fontified t) 1987 1989 (fontified t) 1989 1991 (face font-lock-function-name-face fontified t) 1991 2000 (fontified t) 2000 2002 (face font-lock-keyword-face fontified t) 2002 2023 (fontified t) 2023 2029 (face font-lock-keyword-face fontified t) 2029 2031 (fontified t) 2031 2033 (face font-lock-function-name-face fontified t) 2033 2058 (fontified t) 2058 2060 (face font-lock-comment-delimiter-face fontified t) 2060 2070 (face font-lock-comment-face fontified t) 2070 2073 (face font-lock-comment-face fontified t) 2073 2074 (face font-lock-comment-delimiter-face fontified t) 2074 2076 (face font-lock-comment-face fontified t) 2076 2077 (fontified t face font-lock-comment-face) 2077 2079 (fontified t face font-lock-comment-face) 2080 2081 (face font-lock-comment-delimiter-face) 2081 2093 (face font-lock-comment-face) 2094 2095 (face font-lock-comment-delimiter-face) 2095 2105 (face font-lock-comment-face) 2106 2107 (face font-lock-comment-delimiter-face) 2107 2116 (face font-lock-comment-face) 2116 2117 (face font-lock-comment-face) 2118 2119 (face font-lock-comment-delimiter-face) 2119 2141 (face font-lock-comment-face) 2142 2143 (face font-lock-comment-delimiter-face) 2143 2158 (face font-lock-comment-face) 2159 2160 (face font-lock-comment-delimiter-face) 2160 2181 (face font-lock-comment-face) 2182 2183 (face font-lock-comment-delimiter-face) 2183 2201 (face font-lock-comment-face) 2202 2203 (face font-lock-comment-delimiter-face) 2203 2213 (face font-lock-comment-face) 2214 2215 (face font-lock-comment-delimiter-face) 2215 2249 (face font-lock-comment-face) 2249 2250 (face font-lock-comment-delimiter-face) 2250 2258 (face font-lock-comment-face) 2258 2259 (face font-lock-comment-delimiter-face) 2259 2268 (face font-lock-comment-face) 2269 2270 (face font-lock-comment-delimiter-face) 2270 2290 (face font-lock-comment-face) 2290 2291 (face font-lock-comment-delimiter-face) 2291 2319 (face font-lock-comment-face) 2319 2320 (face font-lock-comment-delimiter-face) 2320 2339 (face font-lock-comment-face) 2340 2341 (face font-lock-comment-delimiter-face) 2341 2366 (face font-lock-comment-face) 2367 2368 (face font-lock-comment-delimiter-face) 2368 2391 (face font-lock-comment-face) 2391 2392 (face font-lock-comment-delimiter-face) 2392 2408 (face font-lock-comment-face) 2408 2409 (face font-lock-comment-delimiter-face) 2409 2424 (face font-lock-comment-face) 2424 2425 (face font-lock-comment-delimiter-face) 2425 2439 (face font-lock-comment-face) 2440 2442 (face font-lock-comment-delimiter-face) 2442 2455 (face font-lock-comment-face) 2456 2462 (face font-lock-keyword-face) 2464 2476 (face font-lock-function-name-face) 2486 2488 (face font-lock-keyword-face) 2509 2511 (face font-lock-comment-delimiter-face) 2511 2524 (face font-lock-comment-face) 2525 2531 (face font-lock-keyword-face) 2533 2534 (face font-lock-function-name-face) 2543 2549 (face font-lock-keyword-face) 2551 2555 (face font-lock-function-name-face) 2564 2566 (face font-lock-keyword-face) 2594 2595 (face font-lock-comment-delimiter-face) 2595 2610 (face font-lock-comment-face) 2612 2615 (face font-lock-comment-delimiter-face) 2615 2629 (face font-lock-comment-face) 2631 2637 (face font-lock-keyword-face) 2639 2648 (face font-lock-function-name-face) 2661 2663 (face font-lock-keyword-face) 2759 2765 (face font-lock-keyword-face) 2767 2778 (face font-lock-function-name-face) 2801 2807 (face font-lock-keyword-face) 2808 2812 (face font-lock-function-name-face) 2819 2825 (face font-lock-keyword-face) 2826 2835 (face font-lock-function-name-face) 2846 2848 (face font-lock-keyword-face) 2872 2874 (face font-lock-keyword-face) 3031 3037 (face font-lock-keyword-face) 3039 3046 (face font-lock-function-name-face) 3089 3095 (face font-lock-keyword-face) 3097 3104 (face font-lock-function-name-face) 3129 3135 (face font-lock-keyword-face) 3137 3149 (face font-lock-function-name-face) 3201 3207 (face font-lock-keyword-face) 3209 3213 (face font-lock-function-name-face) 3240 3241 (face font-lock-comment-delimiter-face) 3241 3252 (face font-lock-comment-face) 3252 3253 (face font-lock-comment-delimiter-face) 3253 3273 (face font-lock-comment-face) 3273 3274 (face font-lock-comment-delimiter-face) 3274 3305 (face font-lock-comment-face) 3305 3306 (face font-lock-comment-delimiter-face) 3306 3329 (face font-lock-comment-face) 3331 3333 (face font-lock-comment-delimiter-face) 3333 3346 (face font-lock-comment-face) 3347 3353 (face font-lock-keyword-face) 3355 3361 (face font-lock-function-name-face) 3400 3404 (face font-lock-keyword-face) 3438 3442 (face font-lock-keyword-face) 3459 3460 (face font-lock-comment-delimiter-face) 3460 3483 (face font-lock-comment-face) 3484 3485 (face font-lock-comment-delimiter-face) 3485 3508 (face font-lock-comment-face) 3510 3516 (face font-lock-keyword-face) 3518 3527 (face font-lock-function-name-face)) . 1) (undo-tree-id108 . 14204) (undo-tree-id109 . -575) (undo-tree-id110 . -1260) (undo-tree-id111 . -575) (undo-tree-id112 . -614) (undo-tree-id113 . -614) (undo-tree-id114 . -614) (undo-tree-id115 . -3007) (undo-tree-id116 . -576) (undo-tree-id117 . 14204) (undo-tree-id118 . -576) (undo-tree-id119 . -576) (undo-tree-id120 . -576) (undo-tree-id121 . -576) (undo-tree-id122 . -576) (undo-tree-id123 . -2966) (undo-tree-id124 . -576) (undo-tree-id125 . -574) (undo-tree-id126 . -574) (undo-tree-id127 . -574) (undo-tree-id128 . -574) (undo-tree-id129 . -574) (undo-tree-id130 . -574) (undo-tree-id131 . -574) (undo-tree-id132 . -574) (undo-tree-id133 . -574) (undo-tree-id134 . -574) (undo-tree-id135 . -574) (undo-tree-id136 . -574) (undo-tree-id137 . -574) (undo-tree-id138 . -574) (undo-tree-id139 . -574) (undo-tree-id140 . -1260) (undo-tree-id141 . -14779) (t 26667 21457 550370 260000)) nil (26678 35460 893265 502000) 0 nil] [nil nil ((576 . 578) (t 26667 21457 550370 260000)) ((#("  " 0 2 (fontified t)) . 576) (undo-tree-id104 . -1) (undo-tree-id105 . -1) (undo-tree-id106 . -1)) (26677 64077 615991 703000) 0 nil])
+([nil nil ((1 . 14512)) ((#(";;;;CODE FROM CHAPTER 1 OF STRUCTURE AND INTERPRETATION OF COMPUTER PROGRAMS
+
+;;; Examples from the book are commented out with ;: so that they
+;;;  are easy to find and so that they will be omitted if you evaluate a
+;;;  chunk of the file (programs with intervening examples) in Scheme.
+
+;;; BEWARE: Although the whole file can be loaded into Scheme,
+;;;  don't expect the programs to work if you do so.  For example,
+;;;  the redefinition of + in exercise 1.9 wreaks havoc with the
+;;;  last version of square defined here.
+
+
+;;;SECTION 1.1.1
+
+;; interpreter examples
+
+;: 486
+
+;: (+ 137 349)
+;: (- 1000 334)
+;: (* 5 99)
+;: (/ 10 5)
+;: (+ 2.7 10)
+
+;: (+ 21 35 12 7)
+;: (* 25 4 12)
+
+;: (+ (* 3 5) (- 10 6))
+
+;: (+ (* 3 (+ (* 2 4) (+ 3 5))) (+ (- 10 7) 6))
+
+;: (+ (* 3
+;:       (+ (* 2 4)
+;:          (+ 3 5)))
+;:    (+ (- 10 7)
+;:       6))
+
+
+;;;SECTION 1.1.2
+
+;: (define size 2)
+;: size
+;: (* 5 size)
+
+;: (define pi 3.14159)
+;: (define radius 10)
+;: (* pi (* radius radius))
+;: (define circumference (* 2 pi radius))
+;: circumference
+
+
+;;;SECTION 1.1.3
+
+;: (* (+ 2 (* 4 6))
+;:    (+ 3 5 7))
+
+
+;;;SECTION 1.1.4
+
+(define (square x) (* x x))
+
+;: (square 21)
+;: (square (+ 2 5))
+;: (square (square 3))
+
+(define (sum-of-squares x y)
+  (+ (square x) (square y)))
+
+;: (sum-of-squares 3 4)
+
+(define (f a)
+  (sum-of-squares (+ a 1) (* a 2)))
+
+;: (f 5)
+
+
+;;;SECTION 1.1.5
+
+;: (f 5)
+;: (sum-of-squares (+ 5 1) (* 5 2))
+;: (+ (square 6) (square 10))
+;: (+ (* 6 6) (* 10 10))
+;: (+ 36 100)
+
+;: (f 5)
+;: (sum-of-squares (+ 5 1) (* 5 2))
+;: (+    (square (+ 5 1))      (square (* 5 2))  )
+;: (+    (* (+ 5 1) (+ 5 1))   (* (* 5 2) (* 5 2)))
+;: (+         (* 6 6)             (* 10 10))
+;: (+           36                   100)
+;:                     136
+
+
+;;;SECTION 1.1.6
+
+(define (abs x)
+  (cond ((> x 0) x)
+        ((= x 0) 0)
+        ((< x 0) (- x))))
+
+(define (abs x)
+  (cond ((< x 0) (- x))
+        (else x)))
+
+(define (abs x)
+  (if (< x 0)
+      (- x)
+      x))
+
+;: (and (> x 5) (< x 10))
+
+(define (>= x y)
+  (or (> x y) (= x y)))
+
+(define (>= x y)
+  (not (< x y)))
+
+
+;;EXERCISE 1.1
+;: 10
+
+;: (+ 5 3 4)
+
+;: (- 9 1)
+
+;: (/ 6 2)
+
+;: (+ (* 2 4) (- 4 6))
+
+;: (define a 3)
+
+;: (define b (+ a 1))
+
+;: (+ a b (* a b))
+
+;: (= a b)
+
+;: (if (and (> b a) (< b (* a b)))
+;:     b
+;:     a)
+
+;: (cond ((= a 4) 6)
+;:       ((= b 4) (+ 6 7 a))
+;:       (else 25))
+
+;: (+ 2 (if (> b a) b a))
+
+;: (* (cond ((> a b) a)
+;: 	 ((< a b) b)
+;: 	 (else -1))
+;:    (+ a 1))
+
+;;EXERCISE 1.4
+(define (a-plus-abs-b a b)
+  ((if (> b 0) + -) a b))
+
+;;EXERCISE 1.5
+(define (p) (p))
+
+(define (test x y)
+  (if (= x 0)
+      0
+      y))
+
+;: (test 0 (p))
+
+
+;;;SECTION 1.1.7
+
+(define (sqrt-iter guess x)
+  (if (good-enough? guess x)
+      guess
+      (sqrt-iter (improve guess x)
+                 x)))
+
+(define (improve guess x)
+  (average guess (/ x guess)))
+
+(define (average x y)
+  (/ (+ x y) 2))
+
+(define (good-enough? guess x)
+  (< (abs (- (square guess) x)) 0.001))
+
+(define (sqrt x)
+  (sqrt-iter 1.0 x))
+
+
+;: (sqrt 9)
+;: (sqrt (+ 100 37))
+;: (sqrt (+ (sqrt 2) (sqrt 3)))
+;: (square (sqrt 1000))
+
+
+;;EXERCISE 1.6
+(define (new-if predicate then-clause else-clause)
+  (cond (predicate then-clause)
+        (else else-clause)))
+
+;: (new-if (= 2 3) 0 5)
+
+;: (new-if (= 1 1) 0 5)
+
+(define (sqrt-iter guess x)
+  (new-if (good-enough? guess x)
+          guess
+          (sqrt-iter (improve guess x)
+                     x)))
+
+
+;;;SECTION 1.1.8
+
+(define (square x) (* x x))
+
+(define (square x) 
+  (exp (double (log x))))
+
+(define (double x) (+ x x))
+
+
+;; As in 1.1.7
+(define (sqrt x)
+  (sqrt-iter 1.0 x))
+
+(define (sqrt-iter guess x)
+  (if (good-enough? guess x)
+      guess
+      (sqrt-iter (improve guess x) x)))
+
+(define (good-enough? guess x)
+  (< (abs (- (square guess) x)) 0.001))
+
+(define (improve guess x)
+  (average guess (/ x guess)))
+
+
+;; Block-structured
+(define (sqrt x)
+  (define (good-enough? guess x)
+    (< (abs (- (square guess) x)) 0.001))
+  (define (improve guess x)
+    (average guess (/ x guess)))
+  (define (sqrt-iter guess x)
+    (if (good-enough? guess x)
+        guess
+        (sqrt-iter (improve guess x) x)))
+  (sqrt-iter 1.0 x))
+
+;; Taking advantage of lexical scoping
+(define (sqrt x)
+  (define (good-enough? guess)
+    (< (abs (- (square guess) x)) 0.001))
+  (define (improve guess)
+    (average guess (/ x guess)))
+  (define (sqrt-iter guess)
+    (if (good-enough? guess)
+        guess
+        (sqrt-iter (improve guess))))
+  (sqrt-iter 1.0))
+
+;;;SECTION 1.2.1
+
+;; Recursive
+
+(define (factorial n)
+  (if (= n 1)
+      1
+      (* n (factorial (- n 1)))))
+
+
+;; Iterative
+
+(define (factorial n)
+  (fact-iter 1 1 n))
+
+(define (fact-iter product counter max-count)
+  (if (> counter max-count)
+      product
+      (fact-iter (* counter product)
+                 (+ counter 1)
+                 max-count)))
+
+;; Iterative, block-structured (from footnote)
+(define (factorial n)
+  (define (iter product counter)
+    (if (> counter n)
+        product
+        (iter (* counter product)
+              (+ counter 1))))
+  (iter 1 1))
+
+
+;;EXERCISE 1.9
+(define (+ a b)
+  (if (= a 0)
+      b
+      (inc (+ (dec a) b))))
+
+(define (+ a b)
+  (if (= a 0)
+      b
+      (+ (dec a) (inc b))))
+
+;;EXERCISE 1.10
+(define (A x y)
+  (cond ((= y 0) 0)
+        ((= x 0) (* 2 y))
+        ((= y 1) 2)
+        (else (A (- x 1)
+                 (A x (- y 1))))))
+
+;: (A 1 10)
+
+;: (A 2 4)
+
+;: (A 3 3)
+
+(define (f n) (A 0 n))
+
+(define (g n) (A 1 n))
+
+(define (h n) (A 2 n))
+
+(define (k n) (* 5 n n))
+
+
+;;;SECTION 1.2.2
+
+;; Recursive
+
+(define (fib n)
+  (cond ((= n 0) 0)
+        ((= n 1) 1)
+        (else (+ (fib (- n 1))
+                 (fib (- n 2))))))
+
+;; Iterative
+
+(define (fib n)
+  (fib-iter 1 0 n))
+
+(define (fib-iter a b count)
+  (if (= count 0)
+      b
+      (fib-iter (+ a b) a (- count 1))))
+
+
+;; Counting change
+
+(define (count-change amount)
+  (cc amount 5))
+
+(define (cc amount kinds-of-coins)
+  (cond ((= amount 0) 1)
+        ((or (< amount 0) (= kinds-of-coins 0)) 0)
+        (else (+ (cc amount
+                     (- kinds-of-coins 1))
+                 (cc (- amount
+                        (first-denomination kinds-of-coins))
+                     kinds-of-coins)))))
+
+(define (first-denomination kinds-of-coins)
+  (cond ((= kinds-of-coins 1) 1)
+        ((= kinds-of-coins 2) 5)
+        ((= kinds-of-coins 3) 10)
+        ((= kinds-of-coins 4) 25)
+        ((= kinds-of-coins 5) 50)))
+
+;: (count-change 100)
+
+
+;;;SECTION 1.2.3
+
+;;EXERCISE 1.15
+(define (cube x) (* x x x))
+
+(define (p x) (- (* 3 x) (* 4 (cube x))))
+
+(define (sine angle)
+   (if (not (> (abs angle) 0.1))
+       angle
+       (p (sine (/ angle 3.0)))))
+
+
+;;;SECTION 1.2.4
+
+;; Linear recursion
+(define (expt b n)
+  (if (= n 0)
+      1
+      (* b (expt b (- n 1)))))
+
+
+;; Linear iteration
+(define (expt b n)
+  (expt-iter b n 1))
+
+(define (expt-iter b counter product)
+  (if (= counter 0)
+      product
+      (expt-iter b
+                (- counter 1)
+                (* b product)))) 
+
+;; Logarithmic iteration
+(define (fast-expt b n)
+  (cond ((= n 0) 1)
+        ((even? n) (square (fast-expt b (/ n 2))))
+        (else (* b (fast-expt b (- n 1))))))
+
+(define (even? n)
+  (= (remainder n 2) 0))
+
+
+;;EXERCISE 1.17
+(define (* a b)
+  (if (= b 0)
+      0
+      (+ a (* a (- b 1)))))
+
+;;EXERCISE 1.19
+(define (fib n)
+  (fib-iter 1 0 0 1 n))
+
+(define (fib-iter a b p q count)
+  (cond ((= count 0) b)
+        ((even? count)
+         (fib-iter a
+                   b
+                   ??FILL-THIS-IN?? ; compute p'
+                   ??FILL-THIS-IN?? ; compute q'
+                   (/ count 2)))
+        (else (fib-iter (+ (* b q) (* a q) (* a p))
+                        (+ (* b p) (* a q))
+                        p
+                        q
+                        (- count 1)))))
+
+
+;;;SECTION 1.2.5
+
+(define (gcd a b)
+  (if (= b 0)
+      a
+      (gcd b (remainder a b))))
+
+
+;;;SECTION 1.2.6
+
+;; prime?
+
+(define (smallest-divisor n)
+  (find-divisor n 2))
+
+(define (find-divisor n test-divisor)
+  (cond ((> (square test-divisor) n) n)
+        ((divides? test-divisor n) test-divisor)
+        (else (find-divisor n (+ test-divisor 1)))))
+
+(define (divides? a b)
+  (= (remainder b a) 0))
+
+(define (prime? n)
+  (= n (smallest-divisor n)))
+
+
+;; fast-prime?
+
+(define (expmod base exp m)
+  (cond ((= exp 0) 1)
+        ((even? exp)
+         (remainder (square (expmod base (/ exp 2) m))
+                    m))
+        (else
+         (remainder (* base (expmod base (- exp 1) m))
+                    m))))        
+
+(define (fermat-test n)
+  (define (try-it a)
+    (= (expmod a n n) a))
+  (try-it (+ 1 (random (- n 1)))))
+
+(define (fast-prime? n times)
+  (cond ((= times 0) true)
+        ((fermat-test n) (fast-prime? n (- times 1)))
+        (else false)))
+
+
+;;EXERCISE 1.22
+(define (timed-prime-test n)
+  (newline)
+  (display n)
+  (start-prime-test n (runtime)))
+
+(define (start-prime-test n start-time)
+  (if (prime? n)
+      (report-prime (- (runtime) start-time))))
+
+(define (report-prime elapsed-time)
+  (display \" *** \")
+  (display elapsed-time))
+
+;;EXERCISE 1.25
+(define (expmod base exp m)
+  (remainder (fast-expt base exp) m))
+
+;;EXERCISE 1.26
+(define (expmod base exp m)
+  (cond ((= exp 0) 1)
+        ((even? exp)
+         (remainder (* (expmod base (/ exp 2) m)
+                       (expmod base (/ exp 2) m))
+                    m))
+        (else
+         (remainder (* base (expmod base (- exp 1) m))
+                    m))))
+
+;;;SECTION 1.3
+
+(define (cube x) (* x x x))
+
+;;;SECTION 1.3.1
+
+(define (sum-integers a b)
+  (if (> a b)
+      0
+      (+ a (sum-integers (+ a 1) b))))
+
+(define (sum-cubes a b)
+  (if (> a b)
+      0
+      (+ (cube a) (sum-cubes (+ a 1) b))))
+
+(define (pi-sum a b)
+  (if (> a b)
+      0
+      (+ (/ 1.0 (* a (+ a 2))) (pi-sum (+ a 4) b))))
+
+(define (sum term a next b)
+  (if (> a b)
+      0
+      (+ (term a)
+         (sum term (next a) next b))))
+
+
+;; Using sum
+
+(define (inc n) (+ n 1))
+
+(define (sum-cubes a b)
+  (sum cube a inc b))
+
+;: (sum-cubes 1 10)
+
+
+(define (identity x) x)
+
+(define (sum-integers a b)
+  (sum identity a inc b))
+
+;: (sum-integers 1 10)
+
+
+(define (pi-sum a b)
+  (define (pi-term x)
+    (/ 1.0 (* x (+ x 2))))
+  (define (pi-next x)
+    (+ x 4))
+  (sum pi-term a pi-next b))
+
+;: (* 8 (pi-sum 1 1000))
+
+
+(define (integral f a b dx)
+  (define (add-dx x) (+ x dx))
+  (* (sum f (+ a (/ dx 2)) add-dx b)
+     dx))
+
+;: (integral cube 0 1 0.01)
+
+;: (integral cube 0 1 0.001)
+
+
+;;EXERCISE 1.32
+;: (accumulate combiner null-value term a next b)
+
+;;;SECTION 1.3.2
+
+(define (pi-sum a b)
+  (sum (lambda (x) (/ 1.0 (* x (+ x 2))))
+       a
+       (lambda (x) (+ x 4))
+       b))
+
+(define (integral f a b dx)
+  (* (sum f
+          (+ a (/ dx 2.0))
+          (lambda (x) (+ x dx))
+          b)
+     dx))
+
+(define (plus4 x) (+ x 4))
+
+(define plus4 (lambda (x) (+ x 4)))
+
+;: ((lambda (x y z) (+ x y (square z))) 1 2 3)
+
+
+;; Using let
+
+(define (f x y)
+  (define (f-helper a b)
+    (+ (* x (square a))
+       (* y b)
+       (* a b)))
+  (f-helper (+ 1 (* x y)) 
+            (- 1 y)))
+
+(define (f x y)
+  ((lambda (a b)
+     (+ (* x (square a))
+        (* y b)
+        (* a b)))
+   (+ 1 (* x y))
+   (- 1 y)))
+
+(define (f x y)
+  (let ((a (+ 1 (* x y)))
+        (b (- 1 y)))
+    (+ (* x (square a))
+       (* y b)
+       (* a b))))
+
+;: (+ (let ((x 3))
+;:      (+ x (* x 10)))
+;:    x)
+
+;: (let ((x 3)
+;:       (y (+ x 2)))
+;:   (* x y))
+
+(define (f x y)
+  (define a (+ 1 (* x y)))
+  (define b (- 1 y))
+  (+ (* x (square a))
+     (* y b)
+     (* a b)))
+
+
+;;EXERCISE 1.34
+(define (f g)
+  (g 2))
+
+;: (f square)
+
+;: (f (lambda (z) (* z (+ z 1))))
+
+
+;;;SECTION 1.3.3
+
+;; Half-interval method
+
+(define (search f neg-point pos-point)
+  (let ((midpoint (average neg-point pos-point)))
+    (if (close-enough? neg-point pos-point)
+        midpoint
+        (let ((test-value (f midpoint)))
+          (cond ((positive? test-value)
+                 (search f neg-point midpoint))
+                ((negative? test-value)
+                 (search f midpoint pos-point))
+                (else midpoint))))))
+
+(define (close-enough? x y)
+  (< (abs (- x y)) 0.001))
+
+(define (half-interval-method f a b)
+  (let ((a-value (f a))
+        (b-value (f b)))
+    (cond ((and (negative? a-value) (positive? b-value))
+           (search f a b))
+          ((and (negative? b-value) (positive? a-value))
+           (search f b a))
+          (else
+           (error \"Values are not of opposite sign\" a b)))))
+
+
+;: (half-interval-method sin 2.0 4.0)
+
+;: (half-interval-method (lambda (x) (- (* x x x) (* 2 x) 3))
+;:                       1.0
+;:                       2.0)
+
+
+;; Fixed points
+
+(define tolerance 0.00001)
+
+(define (fixed-point f first-guess)
+  (define (close-enough? v1 v2)
+    (< (abs (- v1 v2)) tolerance))
+  (define (try guess)
+    (let ((next (f guess)))
+      (if (close-enough? guess next)
+          next
+          (try next))))
+  (try first-guess))
+
+
+;: (fixed-point cos 1.0)
+
+;: (fixed-point (lambda (y) (+ (sin y) (cos y)))
+;:              1.0)
+
+
+(define (sqrt x)
+  (fixed-point (lambda (y) (/ x y))
+               1.0))
+
+(define (sqrt x)
+  (fixed-point (lambda (y) (average y (/ x y)))
+               1.0))
+
+
+;;EXERCISE 1.37
+;: (cont-frac (lambda (i) 1.0)
+;:            (lambda (i) 1.0)
+;:            k)
+
+
+;;;SECTION 1.3.4
+
+(define (average-damp f)
+  (lambda (x) (average x (f x))))
+
+;: ((average-damp square) 10)
+
+(define (sqrt x)
+  (fixed-point (average-damp (lambda (y) (/ x y)))
+               1.0))
+
+(define (cube-root x)
+  (fixed-point (average-damp (lambda (y) (/ x (square y))))
+               1.0))
+
+
+;; Newton's method
+
+(define (deriv g)
+  (lambda (x)
+    (/ (- (g (+ x dx)) (g x))
+       dx)))
+(define dx 0.00001)
+
+
+(define (cube x) (* x x x))
+
+;: ((deriv cube) 5)
+
+(define (newton-transform g)
+  (lambda (x)
+    (- x (/ (g x) ((deriv g) x)))))
+
+(define (newtons-method g guess)
+  (fixed-point (newton-transform g) guess))
+
+
+(define (sqrt x)
+  (newtons-method (lambda (y) (- (square y) x))
+                  1.0))
+
+
+;; Fixed point of transformed function
+
+(define (fixed-point-of-transform g transform guess)
+  (fixed-point (transform g) guess))
+
+(define (sqrt x)
+  (fixed-point-of-transform (lambda (y) (/ x y))
+                            average-damp
+                            1.0))
+
+(define (sqrt x)
+  (fixed-point-of-transform (lambda (y) (- (square y) x))
+                            newton-transform
+                            1.0))
+
+
+;;EXERCISE 1.40
+;: (newtons-method (cubic a b c) 1)
+
+
+;;EXERCISE 1.41
+;: (((double (double double)) inc) 5)
+
+
+;;EXERCISE 1.42
+;: ((compose square inc) 6)
+
+
+;;EXERCISE 1.43
+;: ((repeated square 2) 5)
+
+" 0 4 (face font-lock-comment-delimiter-face fontified t) 4 77 (face font-lock-comment-face fontified t) 77 78 (fontified t) 78 82 (face font-lock-comment-delimiter-face fontified t) 82 144 (face font-lock-comment-face fontified t) 144 149 (face font-lock-comment-delimiter-face fontified t) 149 217 (face font-lock-comment-face fontified t) 217 222 (face font-lock-comment-delimiter-face fontified t) 222 288 (face font-lock-comment-face fontified t) 288 289 (fontified t) 289 293 (face font-lock-comment-delimiter-face fontified t) 293 352 (face font-lock-comment-face fontified t) 352 357 (face font-lock-comment-delimiter-face fontified t) 357 419 (face font-lock-comment-face fontified t) 419 424 (face font-lock-comment-delimiter-face fontified t) 424 484 (face font-lock-comment-face fontified t) 484 489 (face font-lock-comment-delimiter-face fontified t) 489 526 (face font-lock-comment-face fontified t) 526 528 (fontified t) 528 531 (face font-lock-comment-delimiter-face fontified t) 531 545 (face font-lock-comment-face fontified t) 545 546 (fontified t) 546 549 (face font-lock-comment-delimiter-face fontified t) 549 570 (face font-lock-comment-face fontified t) 570 571 (fontified t) 571 572 (face font-lock-comment-delimiter-face fontified t) 572 578 (face font-lock-comment-face fontified t) 578 579 (fontified t) 579 580 (face font-lock-comment-delimiter-face fontified t) 580 594 (face font-lock-comment-face fontified t) 594 595 (face font-lock-comment-delimiter-face fontified t) 595 610 (face font-lock-comment-face fontified t) 610 611 (face font-lock-comment-delimiter-face fontified t) 611 622 (face font-lock-comment-face fontified t) 622 623 (face font-lock-comment-delimiter-face fontified t) 623 634 (face font-lock-comment-face fontified t) 634 635 (face font-lock-comment-delimiter-face fontified t) 635 648 (face font-lock-comment-face fontified t) 648 649 (fontified t) 649 650 (face font-lock-comment-delimiter-face fontified t) 650 667 (face font-lock-comment-face fontified t) 667 668 (face font-lock-comment-delimiter-face fontified t) 668 682 (face font-lock-comment-face fontified t) 682 683 (fontified t) 683 684 (face font-lock-comment-delimiter-face fontified t) 684 707 (face font-lock-comment-face fontified t) 707 708 (fontified t) 708 709 (face font-lock-comment-delimiter-face fontified t) 709 756 (face font-lock-comment-face fontified t) 756 757 (fontified t) 757 758 (face font-lock-comment-delimiter-face fontified t) 758 768 (face font-lock-comment-face fontified t) 768 769 (face font-lock-comment-delimiter-face fontified t) 769 788 (face font-lock-comment-face fontified t) 788 789 (face font-lock-comment-delimiter-face fontified t) 789 810 (face font-lock-comment-face fontified t) 810 811 (face font-lock-comment-delimiter-face fontified t) 811 828 (face font-lock-comment-face fontified t) 828 829 (face font-lock-comment-delimiter-face fontified t) 829 841 (face font-lock-comment-face fontified t) 841 843 (fontified t) 843 846 (face font-lock-comment-delimiter-face fontified t) 846 860 (face font-lock-comment-face fontified t) 860 861 (fontified t) 861 862 (face font-lock-comment-delimiter-face fontified t) 862 880 (face font-lock-comment-face fontified t) 880 881 (face font-lock-comment-delimiter-face fontified t) 881 888 (face font-lock-comment-face fontified t) 888 889 (face font-lock-comment-delimiter-face fontified t) 889 902 (face font-lock-comment-face fontified t) 902 903 (fontified t) 903 904 (face font-lock-comment-delimiter-face fontified t) 904 926 (face font-lock-comment-face fontified t) 926 927 (face font-lock-comment-delimiter-face fontified t) 927 948 (face font-lock-comment-face fontified t) 948 949 (face font-lock-comment-delimiter-face fontified t) 949 976 (face font-lock-comment-face fontified t) 976 977 (face font-lock-comment-delimiter-face fontified t) 977 1018 (face font-lock-comment-face fontified t) 1018 1019 (face font-lock-comment-delimiter-face fontified t) 1019 1035 (face font-lock-comment-face fontified t) 1035 1037 (fontified t) 1037 1040 (face font-lock-comment-delimiter-face fontified t) 1040 1054 (face font-lock-comment-face fontified t) 1054 1055 (fontified t) 1055 1056 (face font-lock-comment-delimiter-face fontified t) 1056 1075 (face font-lock-comment-face fontified t) 1075 1076 (face font-lock-comment-delimiter-face fontified t) 1076 1092 (face font-lock-comment-face fontified t) 1092 1094 (fontified t) 1094 1097 (face font-lock-comment-delimiter-face fontified t) 1097 1111 (face font-lock-comment-face fontified t) 1111 1113 (fontified t) 1113 1119 (face font-lock-keyword-face fontified t) 1119 1121 (fontified t) 1121 1127 (face font-lock-function-name-face fontified t) 1127 1141 (fontified t) 1141 1142 (face font-lock-comment-delimiter-face fontified t) 1142 1156 (face font-lock-comment-face fontified t) 1156 1157 (face font-lock-comment-delimiter-face fontified t) 1157 1176 (face font-lock-comment-face fontified t) 1176 1177 (face font-lock-comment-delimiter-face fontified t) 1177 1199 (face font-lock-comment-face fontified t) 1199 1201 (fontified t) 1201 1207 (face font-lock-keyword-face fontified t) 1207 1209 (fontified t) 1209 1223 (face font-lock-function-name-face fontified t) 1223 1259 (fontified t) 1259 1260 (face font-lock-comment-delimiter-face fontified t) 1260 1283 (face font-lock-comment-face fontified t) 1283 1285 (fontified t) 1285 1291 (face font-lock-keyword-face fontified t) 1291 1293 (fontified t) 1293 1294 (face font-lock-function-name-face fontified t) 1294 1335 (fontified t) 1335 1336 (face font-lock-comment-delimiter-face fontified t) 1336 1344 (face font-lock-comment-face fontified t) 1344 1346 (fontified t) 1346 1349 (face font-lock-comment-delimiter-face fontified t) 1349 1363 (face font-lock-comment-face fontified t) 1363 1364 (fontified t) 1364 1365 (face font-lock-comment-delimiter-face fontified t) 1365 1373 (face font-lock-comment-face fontified t) 1373 1374 (face font-lock-comment-delimiter-face fontified t) 1374 1409 (face font-lock-comment-face fontified t) 1409 1410 (face font-lock-comment-delimiter-face fontified t) 1410 1439 (face font-lock-comment-face fontified t) 1439 1440 (face font-lock-comment-delimiter-face fontified t) 1440 1464 (face font-lock-comment-face fontified t) 1464 1465 (face font-lock-comment-delimiter-face fontified t) 1465 1478 (face font-lock-comment-face fontified t) 1478 1479 (fontified t) 1479 1480 (face font-lock-comment-delimiter-face fontified t) 1480 1488 (face font-lock-comment-face fontified t) 1488 1489 (face font-lock-comment-delimiter-face fontified t) 1489 1500 (face font-lock-comment-face fontified t) 1500 1524 (face font-lock-comment-face fontified t) 1524 1525 (face font-lock-comment-delimiter-face fontified t) 1525 1575 (face font-lock-comment-face fontified t) 1575 1576 (face font-lock-comment-delimiter-face fontified t) 1576 1627 (face font-lock-comment-face fontified t) 1627 1628 (face font-lock-comment-delimiter-face fontified t) 1628 1672 (face font-lock-comment-face fontified t) 1672 1673 (face font-lock-comment-delimiter-face fontified t) 1673 1714 (face font-lock-comment-face fontified t) 1714 1715 (face font-lock-comment-delimiter-face fontified t) 1715 1741 (face font-lock-comment-face fontified t) 1741 1743 (fontified t) 1743 1746 (face font-lock-comment-delimiter-face fontified t) 1746 1760 (face font-lock-comment-face fontified t) 1760 1762 (fontified t) 1762 1768 (face font-lock-keyword-face fontified t) 1768 1770 (fontified t) 1770 1773 (face font-lock-function-name-face fontified t) 1773 1780 (fontified t) 1780 1784 (face font-lock-keyword-face fontified t) 1784 1845 (fontified t) 1845 1851 (face font-lock-keyword-face fontified t) 1851 1853 (fontified t) 1853 1856 (face font-lock-function-name-face fontified t) 1856 1863 (fontified t) 1863 1867 (face font-lock-keyword-face fontified t) 1867 1893 (fontified t) 1893 1897 (face font-lock-keyword-face fontified t) 1897 1905 (fontified t) 1905 1911 (face font-lock-keyword-face fontified t) 1911 1913 (fontified t) 1913 1916 (face font-lock-function-name-face fontified t) 1916 1923 (fontified t) 1923 1925 (face font-lock-keyword-face fontified t) 1925 1957 (fontified t) 1957 1958 (face font-lock-comment-delimiter-face fontified t) 1958 1983 (face font-lock-comment-face fontified t) 1983 1985 (fontified t) 1985 1991 (face font-lock-keyword-face fontified t) 1991 1993 (fontified t) 1993 1995 (face font-lock-function-name-face fontified t) 1995 2004 (fontified t) 2004 2006 (face font-lock-keyword-face fontified t) 2006 2027 (fontified t) 2027 2033 (face font-lock-keyword-face fontified t) 2033 2035 (fontified t) 2035 2037 (face font-lock-function-name-face fontified t) 2037 2062 (fontified t) 2062 2064 (face font-lock-comment-delimiter-face fontified t) 2064 2077 (face font-lock-comment-face fontified t) 2077 2078 (face font-lock-comment-delimiter-face fontified t) 2078 2083 (face font-lock-comment-face fontified t) 2083 2084 (fontified t) 2084 2085 (face font-lock-comment-delimiter-face fontified t) 2085 2097 (face font-lock-comment-face fontified t) 2097 2098 (fontified t) 2098 2099 (face font-lock-comment-delimiter-face fontified t) 2099 2109 (face font-lock-comment-face fontified t) 2109 2110 (fontified t) 2110 2111 (face font-lock-comment-delimiter-face fontified t) 2111 2121 (face font-lock-comment-face fontified t) 2121 2122 (fontified t) 2122 2123 (face font-lock-comment-delimiter-face fontified t) 2123 2145 (face font-lock-comment-face fontified t) 2145 2146 (fontified t) 2146 2147 (face font-lock-comment-delimiter-face fontified t) 2147 2162 (face font-lock-comment-face fontified t) 2162 2163 (fontified t) 2163 2164 (face font-lock-comment-delimiter-face fontified t) 2164 2185 (face font-lock-comment-face fontified t) 2185 2186 (fontified t) 2186 2187 (face font-lock-comment-delimiter-face fontified t) 2187 2205 (face font-lock-comment-face fontified t) 2205 2206 (fontified t) 2206 2207 (face font-lock-comment-delimiter-face fontified t) 2207 2217 (face font-lock-comment-face fontified t) 2217 2218 (fontified t) 2218 2219 (face font-lock-comment-delimiter-face fontified t) 2219 2253 (face font-lock-comment-face fontified t) 2253 2254 (face font-lock-comment-delimiter-face fontified t) 2254 2262 (face font-lock-comment-face fontified t) 2262 2263 (face font-lock-comment-delimiter-face fontified t) 2263 2272 (face font-lock-comment-face fontified t) 2272 2273 (fontified t) 2273 2274 (face font-lock-comment-delimiter-face fontified t) 2274 2294 (face font-lock-comment-face fontified t) 2294 2295 (face font-lock-comment-delimiter-face fontified t) 2295 2323 (face font-lock-comment-face fontified t) 2323 2324 (face font-lock-comment-delimiter-face fontified t) 2324 2343 (face font-lock-comment-face fontified t) 2343 2344 (fontified t) 2344 2345 (face font-lock-comment-delimiter-face fontified t) 2345 2370 (face font-lock-comment-face fontified t) 2370 2371 (fontified t) 2371 2372 (face font-lock-comment-delimiter-face fontified t) 2372 2395 (face font-lock-comment-face fontified t) 2395 2396 (face font-lock-comment-delimiter-face fontified t) 2396 2412 (face font-lock-comment-face fontified t) 2412 2413 (face font-lock-comment-delimiter-face fontified t) 2413 2428 (face font-lock-comment-face fontified t) 2428 2429 (face font-lock-comment-delimiter-face fontified t) 2429 2443 (face font-lock-comment-face fontified t) 2443 2444 (fontified t) 2444 2446 (face font-lock-comment-delimiter-face fontified t) 2446 2459 (face font-lock-comment-face fontified t) 2459 2460 (fontified t) 2460 2466 (face font-lock-keyword-face fontified t) 2466 2468 (fontified t) 2468 2480 (face font-lock-function-name-face fontified t) 2480 2490 (fontified t) 2490 2492 (face font-lock-keyword-face fontified t) 2492 2513 (fontified t) 2513 2515 (face font-lock-comment-delimiter-face fontified t) 2515 2528 (face font-lock-comment-face fontified t) 2528 2529 (fontified t) 2529 2535 (face font-lock-keyword-face fontified t) 2535 2537 (fontified t) 2537 2538 (face font-lock-function-name-face fontified t) 2538 2545 (fontified t) 2545 2547 (fontified t) 2547 2553 (face font-lock-keyword-face fontified t) 2553 2555 (fontified t) 2555 2559 (face font-lock-function-name-face fontified t) 2559 2568 (fontified t) 2568 2570 (face font-lock-keyword-face fontified t) 2570 2598 (fontified t) 2598 2599 (face font-lock-comment-delimiter-face fontified t) 2599 2614 (face font-lock-comment-face fontified t) 2614 2616 (fontified t) 2616 2619 (face font-lock-comment-delimiter-face fontified t) 2619 2633 (face font-lock-comment-face fontified t) 2633 2634 (fontified t) 2634 2635 (fontified t) 2635 2641 (face font-lock-keyword-face fontified t) 2641 2643 (fontified t) 2643 2652 (face font-lock-function-name-face fontified t) 2652 2665 (fontified t) 2665 2667 (face font-lock-keyword-face fontified t) 2667 2762 (fontified t) 2762 2768 (face font-lock-keyword-face fontified t) 2768 2770 (fontified t) 2770 2777 (face font-lock-function-name-face fontified t) 2777 2820 (fontified t) 2820 2826 (face font-lock-keyword-face fontified t) 2826 2828 (fontified t) 2828 2835 (face font-lock-function-name-face fontified t) 2835 2860 (fontified t) 2860 2866 (face font-lock-keyword-face fontified t) 2866 2868 (fontified t) 2868 2880 (face font-lock-function-name-face fontified t) 2880 2890 (fontified t) 2890 2900 (fontified t) 2900 2911 (fontified t) 2911 2918 (fontified t) 2918 2919 (fontified t) 2919 2920 (fontified t) 2920 2921 (fontified t) 2921 2922 (fontified t) 2922 2923 (fontified t) 2923 2924 (fontified t) 2924 2925 (fontified t) 2925 2926 (fontified t) 2926 2927 (fontified t) 2927 2930 (fontified t) 2930 2932 (fontified t) 2932 2938 (face font-lock-keyword-face fontified t) 2938 2940 (fontified t) 2940 2944 (face font-lock-function-name-face fontified t) 2944 2969 (fontified t) 2969 2970 (fontified t) 2970 2971 (fontified t) 2971 2972 (face font-lock-comment-delimiter-face fontified t) 2972 2983 (face font-lock-comment-face fontified t) 2983 2984 (face font-lock-comment-delimiter-face fontified t) 2984 3004 (face font-lock-comment-face fontified t) 3004 3005 (face font-lock-comment-delimiter-face fontified t) 3005 3024 (face font-lock-comment-face fontified t) 3024 3036 (face font-lock-comment-face fontified t) 3036 3037 (face font-lock-comment-delimiter-face fontified t) 3037 3060 (face font-lock-comment-face fontified t) 3060 3062 (fontified t) 3062 3064 (face font-lock-comment-delimiter-face fontified t) 3064 3077 (face font-lock-comment-face fontified t) 3077 3078 (fontified t) 3078 3084 (face font-lock-keyword-face fontified t) 3084 3086 (fontified t) 3086 3092 (face font-lock-function-name-face fontified t) 3092 3131 (fontified t) 3131 3135 (face font-lock-keyword-face fontified t) 3135 3169 (fontified t) 3169 3173 (face font-lock-keyword-face fontified t) 3173 3190 (fontified t) 3190 3191 (face font-lock-comment-delimiter-face fontified t) 3191 3214 (face font-lock-comment-face fontified t) 3214 3215 (fontified t) 3215 3216 (face font-lock-comment-delimiter-face fontified t) 3216 3239 (face font-lock-comment-face fontified t) 3239 3241 (fontified t) 3241 3247 (face font-lock-keyword-face fontified t) 3247 3249 (fontified t) 3249 3258 (face font-lock-function-name-face fontified t) 3258 3384 (fontified t) 3384 3387 (face font-lock-comment-delimiter-face fontified t) 3387 3401 (face font-lock-comment-face fontified t) 3401 3403 (fontified t) 3403 3409 (face font-lock-keyword-face fontified t) 3409 3411 (fontified t) 3411 3417 (face font-lock-function-name-face fontified t) 3417 3432 (fontified t) 3432 3438 (face font-lock-keyword-face fontified t) 3438 3440 (fontified t) 3440 3446 (face font-lock-function-name-face fontified t) 3446 3479 (fontified t) 3479 3485 (face font-lock-keyword-face fontified t) 3485 3487 (fontified t) 3487 3493 (face font-lock-function-name-face fontified t) 3493 3508 (fontified t) 3508 3511 (face font-lock-comment-delimiter-face fontified t) 3511 3523 (face font-lock-comment-face fontified t) 3523 3524 (fontified t) 3524 3530 (face font-lock-keyword-face fontified t) 3530 3532 (fontified t) 3532 3536 (face font-lock-function-name-face fontified t) 3536 3563 (fontified t) 3563 3569 (face font-lock-keyword-face fontified t) 3569 3571 (fontified t) 3571 3580 (face font-lock-function-name-face fontified t) 3580 3593 (fontified t) 3593 3595 (face font-lock-keyword-face fontified t) 3595 3673 (fontified t) 3673 3679 (face font-lock-keyword-face fontified t) 3679 3681 (fontified t) 3681 3693 (face font-lock-function-name-face fontified t) 3693 3745 (fontified t) 3745 3751 (face font-lock-keyword-face fontified t) 3751 3753 (fontified t) 3753 3760 (face font-lock-function-name-face fontified t) 3760 3803 (fontified t) 3803 3806 (face font-lock-comment-delimiter-face fontified t) 3806 3823 (face font-lock-comment-face fontified t) 3823 3824 (fontified t) 3824 3830 (face font-lock-keyword-face fontified t) 3830 3832 (fontified t) 3832 3836 (face font-lock-function-name-face fontified t) 3836 3843 (fontified t) 3843 3849 (face font-lock-keyword-face fontified t) 3849 3851 (fontified t) 3851 3863 (face font-lock-function-name-face fontified t) 3863 3918 (fontified t) 3918 3924 (face font-lock-keyword-face fontified t) 3924 3926 (fontified t) 3926 3933 (face font-lock-function-name-face fontified t) 3933 3979 (fontified t) 3979 3985 (face font-lock-keyword-face fontified t) 3985 3987 (fontified t) 3987 3996 (face font-lock-function-name-face fontified t) 3996 4011 (fontified t) 4011 4013 (face font-lock-keyword-face fontified t) 4013 4045 (fontified t) 4045 4051 (fontified t) 4051 4098 (fontified t) 4098 4114 (fontified t) 4114 4115 (fontified t) 4115 4118 (face font-lock-comment-delimiter-face fontified t) 4118 4154 (face font-lock-comment-face fontified t) 4154 4155 (fontified t) 4155 4161 (face font-lock-keyword-face fontified t) 4161 4163 (fontified t) 4163 4167 (face font-lock-function-name-face fontified t) 4167 4174 (fontified t) 4174 4180 (face font-lock-keyword-face fontified t) 4180 4182 (fontified t) 4182 4194 (face font-lock-function-name-face fontified t) 4194 4247 (fontified t) 4247 4253 (face font-lock-keyword-face fontified t) 4253 4255 (fontified t) 4255 4262 (face font-lock-function-name-face fontified t) 4262 4306 (fontified t) 4306 4312 (face font-lock-keyword-face fontified t) 4312 4314 (fontified t) 4314 4323 (face font-lock-function-name-face fontified t) 4323 4336 (fontified t) 4336 4338 (face font-lock-keyword-face fontified t) 4338 4400 (fontified t) 4400 4412 (fontified t) 4412 4429 (fontified t) 4429 4430 (fontified t) 4430 4431 (fontified t) 4431 4433 (fontified t) 4433 4436 (face font-lock-comment-delimiter-face fontified t) 4436 4450 (face font-lock-comment-face fontified t) 4450 4451 (fontified t) 4451 4454 (face font-lock-comment-delimiter-face fontified t) 4454 4464 (face font-lock-comment-face fontified t) 4464 4466 (fontified t) 4466 4468 (face font-lock-keyword-face fontified t) 4468 4469 (face font-lock-keyword-face fontified t) 4469 4470 (face font-lock-keyword-face fontified t) 4470 4471 (fontified t face font-lock-keyword-face) 4471 4472 (fontified t face font-lock-keyword-face) 4472 4474 (fontified t) 4474 4483 (fontified t face font-lock-function-name-face) 4483 4487 (fontified t) 4490 4492 (face font-lock-keyword-face)) . 1) (undo-tree-id437 . 11584) (undo-tree-id438 . -2922) (undo-tree-id439 . -2634) (undo-tree-id440 . 11542) (undo-tree-id441 . -2968) (undo-tree-id442 . -2634) (undo-tree-id443 . -2634) (undo-tree-id444 . -2634) (undo-tree-id445 . -2968) (undo-tree-id446 . -2459) (undo-tree-id447 . -2969) (undo-tree-id448 . -2967) (undo-tree-id449 . -2969) (undo-tree-id450 . -2969) (undo-tree-id451 . -2920) (undo-tree-id452 . -2920) (undo-tree-id453 . -2634) (undo-tree-id454 . -2634) (undo-tree-id455 . -2922) (undo-tree-id456 . -2926) (undo-tree-id457 . -2920) (undo-tree-id458 . -2918) (undo-tree-id459 . -2919) (undo-tree-id460 . -2918) (undo-tree-id461 . -2925) (undo-tree-id462 . -2925) (undo-tree-id463 . -2634) (undo-tree-id464 . -2634) (undo-tree-id465 . -2921) (undo-tree-id466 . -2921) (undo-tree-id467 . -2921) (undo-tree-id468 . -2634) (undo-tree-id469 . -2634) (undo-tree-id470 . -2969) (undo-tree-id471 . -2969) (undo-tree-id472 . -2634) (undo-tree-id473 . -2634) (undo-tree-id474 . -2343) (undo-tree-id475 . -2969) (undo-tree-id476 . -2634) (undo-tree-id477 . -2969) (undo-tree-id478 . -2969) (undo-tree-id479 . -2486) (undo-tree-id480 . -2634) (undo-tree-id481 . -2922) (undo-tree-id482 . -2634) (undo-tree-id483 . -2634) (undo-tree-id484 . -2634) (undo-tree-id485 . -2634) (undo-tree-id486 . -2634) (undo-tree-id487 . -2922) (undo-tree-id488 . -2922) (undo-tree-id489 . -2922) (undo-tree-id490 . -2922) (undo-tree-id491 . -2969) (undo-tree-id492 . -2634) (undo-tree-id493 . -2634) (undo-tree-id494 . -2634) (undo-tree-id495 . -2968) (undo-tree-id496 . -2634) (undo-tree-id497 . -2634) (undo-tree-id498 . -2634) (undo-tree-id499 . -2968) (undo-tree-id500 . -2634) (undo-tree-id501 . -2634) (undo-tree-id502 . -2634) (undo-tree-id503 . -2927) (undo-tree-id504 . -2890) (undo-tree-id505 . -2927) (undo-tree-id506 . -2922)) (26678 35461 609397 117000) 0 nil])
+([nil nil ((586 . 587) (584 . 584) (584 . 586) (581 . 581) (581 . 584) (580 . 580) (580 . 581) (579 . 580) 579) ((#("
+" 0 1 (fontified t)) . 579) (undo-tree-id49 . -1) (undo-tree-id50 . -1) (undo-tree-id51 . -1) (undo-tree-id52 . -1) (undo-tree-id53 . -1) (undo-tree-id54 . -1) (undo-tree-id55 . -1) (undo-tree-id56 . -1) (undo-tree-id57 . -1) (undo-tree-id58 . -1) (undo-tree-id59 . -1) (undo-tree-id60 . -1) (undo-tree-id61 . -1) (undo-tree-id62 . -1) (undo-tree-id63 . -1) (undo-tree-id64 . -1) (#("(" 0 1 (fontified nil)) . 580) (undo-tree-id65 . -1) (undo-tree-id66 . -1) (undo-tree-id67 . -1) (undo-tree-id68 . -1) (undo-tree-id69 . -1) (undo-tree-id70 . -1) (undo-tree-id71 . -1) (undo-tree-id72 . -1) (undo-tree-id73 . -1) (undo-tree-id74 . -1) (undo-tree-id75 . -1) (#("+ 1" 0 3 (fontified nil)) . 581) (undo-tree-id76 . -3) (undo-tree-id77 . -3) (undo-tree-id78 . -3) (undo-tree-id79 . -3) (undo-tree-id80 . -3) (undo-tree-id81 . -3) (undo-tree-id82 . -3) (undo-tree-id83 . -3) (undo-tree-id84 . -3) (undo-tree-id85 . -3) (undo-tree-id86 . -3) (#(" 2" 0 2 (fontified nil)) . 584) (undo-tree-id87 . -2) (undo-tree-id88 . -2) (undo-tree-id89 . -2) (undo-tree-id90 . -2) (undo-tree-id91 . -2) (undo-tree-id92 . -2) (undo-tree-id93 . -2) (undo-tree-id94 . -2) (undo-tree-id95 . -2) (undo-tree-id96 . -2) (undo-tree-id97 . -2) (#(")" 0 1 (fontified t)) . 586) (undo-tree-id98 . -1) (undo-tree-id99 . -1) (undo-tree-id100 . -1) (undo-tree-id101 . -1) (undo-tree-id102 . -1) (undo-tree-id103 . -1)) (26677 64077 415067 6000) 0 nil])
+([nil nil ((2977 . 2978) (2972 . 2972) (2972 . 2977) (2970 . 2970) (2970 . 2972) (2969 . 2970) 2949) nil (26678 35767 803452 547000) 0 nil] [nil nil ((2923 . 2924)) ((#("(" 0 1 (fontified t)) . 2923) (undo-tree-id433 . -1) (undo-tree-id434 . -1) (undo-tree-id435 . -1) (undo-tree-id436 . -1)) (26678 35460 348477 824000) 0 nil] [nil nil ((2901 . 2902)) ((#("(" 0 1 (fontified t)) . 2901) (undo-tree-id203 . -1) (undo-tree-id204 . -1) (undo-tree-id205 . -1) (undo-tree-id206 . -1)) (26678 35170 975386 171000) 0 nil] [nil nil ((2901 . 2902)) ((#("(" 0 1 (fontified t)) . 2901)) (26678 34551 455692 84000) 0 nil] [nil nil ((2904 . 2905) (2901 . 2901) (2901 . 2904) (#("9" 0 1 (fontified t)) . -2901) (undo-tree-id107 . -1) 2902 (2901 . 2902)) ((#("9" 0 1 (fontified nil)) . 2901) (2901 . 2902) (#("( /" 0 3 (fontified nil)) . 2901) (#(" " 0 1 (fontified t)) . 2904)) (26678 34533 515328 14000) 0 nil])
+([nil nil ((588 . 589) (587 . 588)) ((#(" " 0 1 (fontified nil)) . 587) (undo-tree-id43 . -1) (undo-tree-id44 . -1) (undo-tree-id45 . -1) (undo-tree-id46 . -1) (undo-tree-id47 . -1) (#(" " 0 1 (fontified t)) . 588) (undo-tree-id48 . 1)) (26677 63916 888660 462000) 0 nil])
+([nil nil ((2634 . 2635)) nil (26678 35767 803452 176000) 0 nil])
+([nil nil ((2929 . 2930)) ((#(")" 0 1 (fontified t)) . 2929) (undo-tree-id432 . 1)) (26678 35432 602085 959000) 0 nil])
+([nil nil ((2923 . 2924)) ((#(")" 0 1 (fontified t)) . 2923)) (26678 35170 581253 186000) 0 nil])
+nil
+nil
+([nil nil ((588 . 589)) ((#("
+" 0 1 (fontified t)) . 588) (undo-tree-id35 . -1) (undo-tree-id36 . -1) (undo-tree-id37 . -1) (undo-tree-id38 . -1) (undo-tree-id39 . -1) (undo-tree-id40 . -1) (undo-tree-id41 . -1) (undo-tree-id42 . -1)) (26677 63916 565423 995000) 0 nil] [nil nil ((627 . 640)) ((#("jjjjjjjjjjjjj" 0 3 (fontified t) 3 4 (fontified t) 4 5 (fontified t) 5 6 (fontified t) 6 7 (fontified t) 7 8 (fontified t) 8 9 (fontified t) 9 10 (fontified t) 10 11 (fontified t) 11 12 (fontified t) 12 13 (fontified t)) . 627) (undo-tree-id20 . -3) (undo-tree-id21 . -13) (undo-tree-id22 . -13) (undo-tree-id23 . -3) (undo-tree-id24 . -3) (undo-tree-id25 . -13) (undo-tree-id26 . -13) (undo-tree-id27 . -3) (undo-tree-id28 . -13)) (26677 59196 518324 347000) 0 nil])
+([nil nil ((2635 . 2636)) nil (26678 35767 803452 46000) 0 nil])
+([nil nil ((2635 . 2635) (2635 . 2636) (2635 . 2636) (#("(define (sqrt-iter guess x)
+  (if (good-enough? guess x)
+      guess
+      (sqrt-iter (improve guess x)
+                 x)))
+
+(define (improve guess x)
+  (average guess (/ x guess)))
+
+(define (average x y)
+  (/ (+ x y) 2))
+
+(define (good-enough? guess x)
+  (< (abs (- (square guess) x)) (0.001)))
+
+(define (sqrt x)
+  (sqrt-iter 1.0 x))
+" 0 1 (fontified t) 1 7 (face font-lock-keyword-face fontified t) 7 9 (fontified t) 9 18 (face font-lock-function-name-face fontified t) 18 31 (fontified t) 31 33 (face font-lock-keyword-face fontified t) 33 128 (fontified t) 128 134 (face font-lock-keyword-face fontified t) 134 136 (fontified t) 136 143 (face font-lock-function-name-face fontified t) 143 186 (fontified t) 186 192 (face font-lock-keyword-face fontified t) 192 194 (fontified t) 194 201 (face font-lock-function-name-face fontified t) 201 226 (fontified t) 226 232 (face font-lock-keyword-face fontified t) 232 234 (fontified t) 234 246 (face font-lock-function-name-face fontified t) 246 256 (fontified t) 256 266 (fontified t) 266 277 (fontified t) 277 284 (fontified t) 284 285 (fontified t) 285 286 (fontified t) 286 287 (fontified t) 287 289 (fontified t) 289 290 (fontified t) 290 291 (fontified t) 291 292 (fontified t) 292 293 (fontified t) 293 294 (fontified t) 294 295 (fontified t) 295 298 (fontified t) 298 300 (fontified t) 300 306 (face font-lock-keyword-face fontified t) 306 308 (fontified t) 308 312 (face font-lock-function-name-face fontified t) 312 337 (fontified t)) . 2635) (undo-tree-id382 . 43) (undo-tree-id383 . -336) (undo-tree-id384 . -26) (undo-tree-id385 . -336) (undo-tree-id386 . -337) (undo-tree-id387 . -336) (undo-tree-id388 . -337) (undo-tree-id389 . -335) (undo-tree-id390 . -337) (undo-tree-id391 . -337) (undo-tree-id392 . -286) (undo-tree-id393 . -286) (undo-tree-id394 . -288) (undo-tree-id395 . -293) (undo-tree-id396 . -293) (undo-tree-id397 . -293) (undo-tree-id398 . -286) (undo-tree-id399 . -286) (undo-tree-id400 . -286) (undo-tree-id401 . -286) (undo-tree-id402 . -284) (undo-tree-id403 . -285) (undo-tree-id404 . -284) (undo-tree-id405 . -292) (undo-tree-id406 . -292) (undo-tree-id407 . -287) (undo-tree-id408 . -287) (undo-tree-id409 . -287) (undo-tree-id410 . -337) (undo-tree-id411 . -337) (undo-tree-id412 . -337) (undo-tree-id413 . -337) (undo-tree-id414 . -337) (undo-tree-id415 . -336) (undo-tree-id416 . -336) (undo-tree-id417 . -289) (undo-tree-id418 . -289) (undo-tree-id419 . -289) (undo-tree-id420 . -289) (undo-tree-id421 . -289) (undo-tree-id422 . -337) (undo-tree-id423 . -289) (undo-tree-id424 . -289) (undo-tree-id425 . -26) (undo-tree-id426 . -26) (undo-tree-id427 . -316) (undo-tree-id428 . -336) (undo-tree-id429 . -337) (undo-tree-id430 . -337) 2971) ((2635 . 2972) (#("
+" 0 1 (fontified nil)) . 2635) (undo-tree-id431 . 1) (#("r" 0 1 (fontified t)) . 2635)) (26678 35432 601918 774000) 0 nil] [nil nil ((2934 . 2940) (2933 . 2933) (2933 . 2934) (#("0" 0 1 (fontified t)) . -2933) (undo-tree-id269 . -1) (undo-tree-id270 . -1) (undo-tree-id271 . -1) (undo-tree-id272 . -1) (undo-tree-id273 . -1) (undo-tree-id274 . -1) (undo-tree-id275 . -1) (undo-tree-id276 . -1) (#("." 0 1 (fontified t)) . -2934) (undo-tree-id278 . -1) (undo-tree-id279 . -1) (undo-tree-id280 . -1) (undo-tree-id281 . -1) (undo-tree-id282 . -1) (undo-tree-id283 . -1) (undo-tree-id284 . -1) (undo-tree-id285 . -1) (#("0" 0 1 (fontified t)) . -2935) (undo-tree-id287 . -1) (undo-tree-id288 . -1) (undo-tree-id289 . -1) (undo-tree-id290 . -1) (undo-tree-id291 . -1) (undo-tree-id292 . -1) (undo-tree-id293 . -1) (undo-tree-id294 . -1) (#("0" 0 1 (fontified t)) . -2936) (undo-tree-id296 . -1) (undo-tree-id297 . -1) (undo-tree-id298 . -1) (undo-tree-id299 . -1) (undo-tree-id300 . -1) (undo-tree-id301 . -1) (#("1" 0 1 (fontified t)) . -2937) (undo-tree-id303 . -1) 2938 (2932 . 2933) (2926 . 2932) (2924 . 2926)) ((#("\\ " 0 1 (fontified nil) 1 2 (fontified nil)) . 2924) (undo-tree-id367 . -2) (undo-tree-id368 . -2) (undo-tree-id369 . -2) (#("square" 0 6 (fontified nil)) . 2926) (undo-tree-id370 . -6) (undo-tree-id371 . -6) (undo-tree-id372 . -6) (#(" " 0 1 (fontified nil)) . 2932) (undo-tree-id373 . -1) (undo-tree-id374 . -1) (undo-tree-id375 . -1) (2933 . 2938) (#("1" 0 1 (fontified nil)) . 2933) (undo-tree-id376 . -1) (undo-tree-id377 . -1) (undo-tree-id378 . -1) (#("000000" 0 6 (fontified t)) . 2934) (undo-tree-id379 . -6) (undo-tree-id380 . -6) (undo-tree-id381 . -6)) (26678 35423 828991 409000) 0 nil])
+([nil nil ((#(" " 0 1 (fontified t)) . -2925) (undo-tree-id169 . -1) 2926 (2923 . 2926)) ((#("   " 0 2 (fontified nil) 2 3 (fontified nil)) . 2923) (2925 . 2926)) (26678 35169 789077 591000) 0 nil])
+([nil nil ((589 . 590)) ((#("
+" 0 1 (fontified t)) . 589) (undo-tree-id29 . -1) (undo-tree-id30 . -1) (undo-tree-id31 . -1) (undo-tree-id32 . -1) (undo-tree-id33 . -1) (undo-tree-id34 . -1)) (26677 63916 565351 860000) 0 nil])
+([nil nil ((#("j" 0 1 (fontified t)) . -630) (undo-tree-id0 . -1) (undo-tree-id1 . -1) (#("j" 0 1 (fontified t)) . -631) (undo-tree-id2 . -1) (undo-tree-id3 . -1) (#("j" 0 1 (fontified t)) . -632) (undo-tree-id4 . -1) (undo-tree-id5 . -1) (#("j" 0 1 (fontified t)) . -633) (undo-tree-id6 . -1) (undo-tree-id7 . -1) (#("j" 0 1 (fontified t)) . -634) (undo-tree-id8 . -1) (undo-tree-id9 . -1) (#("j" 0 1 (fontified t)) . -635) (undo-tree-id10 . -1) (undo-tree-id11 . -1) (#("j" 0 1 (fontified t)) . -636) (undo-tree-id12 . -1) (undo-tree-id13 . -1) (#("j" 0 1 (fontified t)) . -637) (undo-tree-id14 . -1) (undo-tree-id15 . -1) (#("j" 0 1 (fontified t)) . -638) (undo-tree-id16 . -1) (undo-tree-id17 . -1) (#("j" 0 1 (fontified t)) . -639) (undo-tree-id18 . -1) (undo-tree-id19 . -1) 640) ((630 . 640)) (26677 59196 518115 144000) 0 nil])
+([nil nil ((2926 . 2926) (2926 . 2927) (2925 . 2925) (2925 . 2926) (#("0.001" 0 1 (fontified t) 1 2 (fontified t) 2 3 (fontified t) 3 4 (fontified t) 4 5 (fontified t)) . 2925) (undo-tree-id579 . -4) (undo-tree-id580 . -4) (undo-tree-id581 . -4) (undo-tree-id582 . -4) (undo-tree-id583 . -3) (undo-tree-id584 . -4) (undo-tree-id585 . -5) (undo-tree-id586 . -5) 2929) nil (26678 35767 803451 706000) 0 nil])
+nil
+([nil nil ((2983 . 2984) (t 26678 35209 913897 503000)) ((#("
+" 0 1 (fontified t)) . 2983) (undo-tree-id362 . -1) (undo-tree-id363 . -1) (undo-tree-id364 . -1) (undo-tree-id365 . -1) (undo-tree-id366 . -1)) (26678 35423 412978 143000) 0 nil])
+([nil nil ((2903 . 2904) (2902 . 2902) (2902 . 2903)) ((#("/" 0 1 (fontified nil)) . 2902) (#(" " 0 1 (fontified t)) . 2903)) (26678 35169 435366 189000) 0 nil])
+nil
+nil
+([nil nil ((2931 . 2935) (2930 . 2930) (2930 . 2931) (2929 . 2930) (2928 . 2928) (2928 . 2929) (#("1" 0 1 (fontified t)) . -2928) (undo-tree-id563 . -1) (undo-tree-id564 . -1) 2929 (2927 . 2927) (2927 . 2929) (#(" " 0 1 (fontified t)) . -2927) (undo-tree-id565 . -1) (undo-tree-id566 . -1) (#("s" 0 1 (fontified t)) . -2928) (undo-tree-id567 . -1) (undo-tree-id568 . -1) (#("q" 0 1 (fontified t)) . -2929) (undo-tree-id569 . -1) (undo-tree-id570 . -1) (#("u" 0 1 (fontified t)) . -2930) (undo-tree-id571 . -1) (undo-tree-id572 . -1) (#("a" 0 1 (fontified t)) . -2931) (undo-tree-id573 . -1) (undo-tree-id574 . -1) (#("r" 0 1 (fontified t)) . -2932) (undo-tree-id575 . -1) (undo-tree-id576 . -1) (#("e" 0 1 (fontified t)) . -2933) (undo-tree-id577 . -1) (undo-tree-id578 . -1) 2934 (2929 . 2929) (2929 . 2934) (2927 . 2927) (2927 . 2929) (2926 . 2926) (2926 . 2927)) nil (26678 35767 803448 449000) 0 nil])
+([nil nil ((2924 . 2925) (#("\\" 0 1 (fontified t)) . 2924)) ((2924 . 2925) (#("/" 0 1 (fontified t)) . 2924)) (26678 35422 945013 373000) 0 nil] [nil nil ((#("
+" 0 1 (fontified t)) . 2984) (undo-tree-id307 . 1) (undo-tree-id308 . -1)) ((2984 . 2985)) (26678 35242 397747 478000) 0 nil])
+([nil nil ((2932 . 2933)) ((#("0" 0 1 (fontified t)) . 2932) (t 26678 34866 205265 520000)) (26678 35169 29154 900000) 0 nil])
+([nil nil ((2932 . 2934)) nil (26678 35767 803391 943000) 0 nil])
+([nil nil ((2940 . 2942) (t 26678 35246 893414 599000)) ((#(".0" 0 2 (fontified t)) . 2940) (t 26678 35326 266531 637000)) (26678 35422 563505 648000) 0 nil] [nil nil ((#("(define (sqrt-iter guess x)
+  (if (good-enough? guess x)
+      guess
+      (sqrt-iter (improve guess x)
+                 x)))
+
+(define (improve guess x)
+  (average guess (/ x guess)))
+
+(define (average x y)
+  (/ (+ x y) 2))
+
+(define (good-enough? guess x)
+  (< (abs (- (square guess) x)) (/ square 1000000)))
+
+(define (sqrt x)
+  (sqrt-iter 1.0 x))
+" 0 1 (fontified t) 1 7 (face font-lock-keyword-face fontified t) 7 9 (fontified t) 9 18 (face font-lock-function-name-face fontified t) 18 31 (fontified t) 31 33 (face font-lock-keyword-face fontified t) 33 128 (fontified t) 128 134 (face font-lock-keyword-face fontified t) 134 136 (fontified t) 136 143 (face font-lock-function-name-face fontified t) 143 186 (fontified t) 186 192 (face font-lock-keyword-face fontified t) 192 194 (fontified t) 194 201 (face font-lock-function-name-face fontified t) 201 226 (fontified t) 226 232 (face font-lock-keyword-face fontified t) 232 234 (fontified t) 234 246 (face font-lock-function-name-face fontified t) 246 256 (fontified t) 256 266 (fontified t) 266 284 (fontified t) 284 285 (fontified t) 285 286 (fontified t) 286 287 (fontified t) 287 289 (fontified t) 289 290 (fontified t) 290 305 (fontified t) 305 306 (fontified t) 306 309 (fontified t) 309 311 (fontified t) 311 317 (face font-lock-keyword-face fontified t) 317 319 (fontified t) 319 323 (face font-lock-function-name-face fontified t) 323 348 (fontified t)) . 2635) (undo-tree-id310 . 43) (undo-tree-id311 . -26) (undo-tree-id312 . -347) (undo-tree-id313 . -348) (undo-tree-id314 . -348) (undo-tree-id315 . -346) (undo-tree-id316 . -348) (undo-tree-id317 . -348) (undo-tree-id318 . -286) (undo-tree-id319 . -286) (undo-tree-id320 . -266) (undo-tree-id321 . -266) (undo-tree-id322 . -284) (undo-tree-id323 . -288) (undo-tree-id324 . -288) (undo-tree-id325 . -298) (undo-tree-id326 . -298) (undo-tree-id327 . -298) (undo-tree-id328 . -286) (undo-tree-id329 . -286) (undo-tree-id330 . -286) (undo-tree-id331 . -286) (undo-tree-id332 . -284) (undo-tree-id333 . -285) (undo-tree-id334 . -284) (undo-tree-id335 . -298) (undo-tree-id336 . -298) (undo-tree-id337 . -266) (undo-tree-id338 . -266) (undo-tree-id339 . -287) (undo-tree-id340 . -287) (undo-tree-id341 . -287) (undo-tree-id342 . -266) (undo-tree-id343 . -348) (undo-tree-id344 . -348) (undo-tree-id345 . -348) (undo-tree-id346 . -348) (undo-tree-id347 . -348) (undo-tree-id348 . -348) (undo-tree-id349 . -348) (undo-tree-id350 . -348) (undo-tree-id351 . -348) (undo-tree-id352 . -348) 2983 (t 26678 35246 893414 599000)) ((2635 . 2983)) (26678 35273 261772 555000) 0 nil])
+([nil nil ((#("
+" 0 1 (fontified t)) . 2984) (undo-tree-id305 . 1) (undo-tree-id306 . -1)) ((2984 . 2985)) (26678 35242 397668 590000) 0 nil])
+([nil nil ((#("x" 0 1 (fontified t)) . 2922) (undo-tree-id188 . -1) (undo-tree-id189 . -1) (t 26678 34866 205265 520000)) ((2922 . 2923)) (26678 35168 715047 34000) 0 nil] [nil nil ((#("(define (sqrt-iter guess x)
+  (if (good-enough? guess x)
+      guess
+      (sqrt-iter (improve guess x)
+                 x)))
+
+(define (improve guess x)
+  (average guess (/ x guess)))
+
+(define (average x y)
+  (/ (+ x y) 2))
+
+(define (good-enough? guess x)
+  (< (abs (/ (- (square guess) x)" 0 1 (fontified t) 1 7 (face font-lock-keyword-face fontified t) 7 9 (fontified t) 9 18 (face font-lock-function-name-face fontified t) 18 31 (fontified t) 31 33 (face font-lock-keyword-face fontified t) 33 128 (fontified t) 128 134 (face font-lock-keyword-face fontified t) 134 136 (fontified t) 136 143 (face font-lock-function-name-face fontified t) 143 186 (fontified t) 186 192 (face font-lock-keyword-face fontified t) 192 194 (fontified t) 194 201 (face font-lock-function-name-face fontified t) 201 226 (fontified t) 226 232 (face font-lock-keyword-face fontified t) 232 234 (fontified t) 234 246 (face font-lock-function-name-face fontified t) 246 256 (fontified t) 256 269 (fontified t) 269 289 (fontified t)) . 2635) (undo-tree-id170 . -288) (undo-tree-id171 . -288) (undo-tree-id172 . -288) (undo-tree-id173 . -289) (undo-tree-id174 . -289) (undo-tree-id175 . -289) (undo-tree-id176 . -266) (undo-tree-id177 . -266) (undo-tree-id178 . -266) (undo-tree-id179 . -288) 2923 (t 26678 34866 205265 520000)) ((2635 . 2924)) (26678 34901 921668 493000) 0 nil])
+([nil nil ((2933 . 2934)) nil (26678 35767 803582 472000) 0 nil])
+([nil nil ((2635 . 2912) (#("(define (sqrt-iter guess x)
+  (if (good-enough? guess x)
+      guess
+      (sqrt-iter (improve guess x)
+                 x)))
+
+(define (improve guess x)
+  (average guess (/ x guess)))
+
+(define (average x y)
+  (/ (+ x y) 2))
+
+(define (good-enough? guess x)
+  (< (abs (- (square " 0 1 (fontified t) 1 7 (face font-lock-keyword-face fontified t) 7 9 (fontified t) 9 18 (face font-lock-function-name-face fontified t) 18 31 (fontified t) 31 33 (face font-lock-keyword-face fontified t) 33 128 (fontified t) 128 134 (face font-lock-keyword-face fontified t) 134 136 (fontified t) 136 143 (face font-lock-function-name-face fontified t) 143 186 (fontified t) 186 192 (face font-lock-keyword-face fontified t) 192 194 (fontified t) 194 201 (face font-lock-function-name-face fontified t) 201 226 (fontified t) 226 232 (face font-lock-keyword-face fontified t) 232 234 (fontified t) 234 246 (face font-lock-function-name-face fontified t) 246 256 (fontified t) 256 266 (fontified t) 266 277 (fontified t)) . 2635) (t 26678 35326 266531 637000)) ((2635 . 2912) (#("(define (sqrt-iter guess x)
+  (if (good-enough? guess x)
+      guess
+      (sqrt-iter (improve guess x)
+                 x)))
+
+(define (improve guess x)
+  (average guess (/ x guess)))
+
+(define (average x y)
+  (/ (+ x y) 2))
+
+(define (good-enough? guess x)
+  (< (abs (- (square " 0 1 (fontified t) 1 7 (face font-lock-keyword-face fontified t) 7 9 (fontified t) 9 18 (face font-lock-function-name-face fontified t) 18 31 (fontified t) 31 33 (face font-lock-keyword-face fontified t) 33 128 (fontified t) 128 134 (face font-lock-keyword-face fontified t) 134 136 (fontified t) 136 143 (face font-lock-function-name-face fontified t) 143 186 (fontified t) 186 192 (face font-lock-keyword-face fontified t) 192 194 (fontified t) 194 201 (face font-lock-function-name-face fontified t) 201 226 (fontified t) 226 232 (face font-lock-keyword-face fontified t) 232 234 (fontified t) 234 246 (face font-lock-function-name-face fontified t) 246 256 (fontified t) 256 266 (fontified t) 266 277 (fontified t)) . 2635) (undo-tree-id353 . -276) (undo-tree-id354 . -276) (undo-tree-id355 . -266) (undo-tree-id356 . -266) (undo-tree-id357 . -266) (undo-tree-id358 . -266) (undo-tree-id359 . -266) (undo-tree-id360 . -276) (undo-tree-id361 . -276)) (26678 35422 563264 375000) 0 nil])
+nil
+nil
+([nil nil ((nil rear-nonsticky nil 2923 . 2924) (nil fontified nil 2923 . 2924) (2923 . 2924) 2922) ((#("x" 0 1 (rear-nonsticky nil fontified nil)) . 2923) (nil rear-nonsticky t 2923 . 2924)) (26678 35168 497489 81000) 0 nil])
+nil
+([nil nil ((2988 . 2991) (2987 . 2987) (2987 . 2988) (#("2" 0 1 (fontified t)) . 2987)) nil (26678 35811 657296 763000) 0 nil] [nil nil ((2637 . 2638) (#("(define (sqrt-iter guess x)
+  (if (good-enough? guess x)
+      guess
+      (sqrt-iter (improve guess x)
+                 x)))
+
+(define (improve guess x)
+  (average guess (/ x guess)))
+
+(define (average x y)
+  (/ (+ x y) 2))
+
+(define (good-enough? guess x)
+  (< (abs (- (square guess) x)) (/ x 10000000)))
+
+(define (sqrt x)
+  (sqrt-iter 1.0 x))
+(sqrt 2)
+" 0 1 (fontified t) 1 7 (face font-lock-keyword-face fontified t) 7 9 (fontified t) 9 18 (face font-lock-function-name-face fontified t) 18 31 (fontified t) 31 33 (face font-lock-keyword-face fontified t) 33 128 (fontified t) 128 134 (face font-lock-keyword-face fontified t) 134 136 (fontified t) 136 143 (face font-lock-function-name-face fontified t) 143 186 (fontified t) 186 192 (face font-lock-keyword-face fontified t) 192 194 (fontified t) 194 201 (face font-lock-function-name-face fontified t) 201 226 (fontified t) 226 232 (face font-lock-keyword-face fontified t) 232 234 (fontified t) 234 246 (face font-lock-function-name-face fontified t) 246 256 (fontified t) 256 266 (fontified t) 266 277 (fontified t) 277 284 (fontified t) 284 285 (fontified t) 285 286 (fontified t) 286 287 (fontified t) 287 302 (fontified t) 302 305 (fontified t) 305 307 (fontified t) 307 313 (face font-lock-keyword-face fontified t) 313 315 (fontified t) 315 319 (face font-lock-function-name-face fontified t) 319 323 (fontified t) 323 343 (fontified t) 343 344 (fontified t) 344 352 (fontified t) 352 353 (fontified t)) . 2637) (undo-tree-id507 . 56) (undo-tree-id508 . -351) (undo-tree-id509 . -351) (undo-tree-id510 . -7) (undo-tree-id511 . -352) (undo-tree-id512 . -353) (undo-tree-id513 . -342) (undo-tree-id514 . -353) (undo-tree-id515 . -353) (undo-tree-id516 . -286) (undo-tree-id517 . -286) (undo-tree-id518 . -288) (undo-tree-id519 . -288) (undo-tree-id520 . -286) (undo-tree-id521 . -284) (undo-tree-id522 . -288) (undo-tree-id523 . -287) (undo-tree-id524 . -287) (undo-tree-id525 . -287) (undo-tree-id526 . -353) (undo-tree-id527 . -353) (undo-tree-id528 . -353) (undo-tree-id529 . -353) (undo-tree-id530 . -353) (undo-tree-id531 . -7) (undo-tree-id532 . -288) (undo-tree-id533 . -288) (undo-tree-id534 . -288) (undo-tree-id535 . -288) (undo-tree-id536 . -353) (undo-tree-id537 . -343) (undo-tree-id538 . -288) (undo-tree-id539 . -288) (undo-tree-id540 . -288) (undo-tree-id541 . -353) (undo-tree-id542 . -352) (undo-tree-id543 . -225) (undo-tree-id544 . -225) (undo-tree-id545 . -225) (undo-tree-id546 . -295) (undo-tree-id547 . -295) (undo-tree-id548 . -296) (undo-tree-id549 . -296) (undo-tree-id550 . -296) (undo-tree-id551 . -296) (undo-tree-id552 . -296) (undo-tree-id553 . -296) (undo-tree-id554 . -296) (undo-tree-id555 . -296) (undo-tree-id556 . -296) (undo-tree-id557 . -296) (undo-tree-id558 . -351) (undo-tree-id559 . -351) (undo-tree-id560 . -7) (undo-tree-id561 . -353) (undo-tree-id562 . -353) 2644) ((2637 . 2990) (#("
+" 0 1 (fontified t)) . 2637) (undo-tree-id587 . 1)) (26678 35767 803388 687000) 0 nil])
+nil
+([nil nil ((2923 . 2924)) ((#(" " 0 1 (fontified t)) . 2923) (undo-tree-id195 . -1) (undo-tree-id196 . -1) (undo-tree-id197 . -1) (undo-tree-id198 . -1) (undo-tree-id199 . -1) (undo-tree-id200 . -1) (undo-tree-id201 . -1) (undo-tree-id202 . -1)) (26678 35168 231366 993000) 0 nil])
+([nil nil ((#("0" 0 1 (fontified t)) . -2989) (undo-tree-id630 . -1) 2990) nil (26678 35811 657296 312000) 0 nil])
+nil
+([nil nil ((#("x" 0 1 (rear-nonsticky t fontified t)) . 2924) (undo-tree-id187 . 1)) ((2924 . 2925)) (26678 35166 29491 729000) 0 nil])
+([nil nil ((2934 . 2939)) nil (26678 35811 657415 45000) 0 nil])
+([nil nil ((2925 . 2925) (2925 . 2930) (2924 . 2924) (2924 . 2925)) ((#("s" 0 1 (fontified nil)) . 2924) (undo-tree-id193 . -1) (#("quare" 0 5 (fontified t)) . 2925) (undo-tree-id194 . -5)) (26678 35165 653998 429000) 0 nil])
+([nil current ((2932 . 2934) (#("00000000000" 0 11 (fontified t)) . 2932) (undo-tree-id632 . 4) (undo-tree-id633 . -10) (undo-tree-id634 . -10) (undo-tree-id635 . -10) (undo-tree-id636 . -10) 2942) nil (26679 8767 872550 216000) 0 nil] [nil nil ((2637 . 2638) (#("(define (sqrt-iter guess x)
+  (if (good-enough? guess x)
+      guess
+      (sqrt-iter (improve guess x)
+                 x)))
+
+(define (improve guess x)
+  (average guess (/ x guess)))
+
+(define (average x y)
+  (/ (+ x y) 2))
+
+(define (good-enough? guess x)
+  (< (abs (- (square guess) x)) (/ x 1000000000000)))
+
+(define (sqrt x)
+  (sqrt-iter 1.0 x))
+(sqrt 100)
+" 0 1 (fontified t) 1 7 (face font-lock-keyword-face fontified t) 7 9 (fontified t) 9 18 (face font-lock-function-name-face fontified t) 18 31 (fontified t) 31 33 (face font-lock-keyword-face fontified t) 33 128 (fontified t) 128 134 (face font-lock-keyword-face fontified t) 134 136 (fontified t) 136 143 (face font-lock-function-name-face fontified t) 143 186 (fontified t) 186 192 (face font-lock-keyword-face fontified t) 192 194 (fontified t) 194 201 (face font-lock-function-name-face fontified t) 201 226 (fontified t) 226 232 (face font-lock-keyword-face fontified t) 232 234 (fontified t) 234 246 (face font-lock-function-name-face fontified t) 246 256 (fontified t) 256 266 (fontified t) 266 277 (fontified t) 277 284 (fontified t) 284 285 (fontified t) 285 286 (fontified t) 286 287 (fontified t) 287 307 (fontified t) 307 310 (fontified t) 310 312 (fontified t) 312 318 (face font-lock-keyword-face fontified t) 318 320 (fontified t) 320 324 (face font-lock-function-name-face fontified t) 324 328 (fontified t) 328 348 (fontified t) 348 349 (fontified t) 349 359 (fontified t) 359 360 (fontified t)) . 2637) (undo-tree-id588 . 58) (undo-tree-id589 . -359) (undo-tree-id590 . -26) (undo-tree-id591 . -359) (undo-tree-id592 . -359) (undo-tree-id593 . -360) (undo-tree-id594 . -347) (undo-tree-id595 . -360) (undo-tree-id596 . -360) (undo-tree-id597 . -286) (undo-tree-id598 . -286) (undo-tree-id599 . -288) (undo-tree-id600 . -288) (undo-tree-id601 . -286) (undo-tree-id602 . -284) (undo-tree-id603 . -288) (undo-tree-id604 . -287) (undo-tree-id605 . -287) (undo-tree-id606 . -287) (undo-tree-id607 . -360) (undo-tree-id608 . -360) (undo-tree-id609 . -360) (undo-tree-id610 . -360) (undo-tree-id611 . -360) (undo-tree-id612 . -288) (undo-tree-id613 . -288) (undo-tree-id614 . -288) (undo-tree-id615 . -288) (undo-tree-id616 . -360) (undo-tree-id617 . -348) (undo-tree-id618 . -288) (undo-tree-id619 . -288) (undo-tree-id620 . -288) (undo-tree-id621 . -359) (undo-tree-id622 . -359) (undo-tree-id623 . -207) (undo-tree-id624 . -26) (undo-tree-id625 . -26) (undo-tree-id626 . -349) (undo-tree-id627 . -359) (undo-tree-id628 . -360) (undo-tree-id629 . -360) 2996) ((2637 . 2997) (#("
+" 0 1 (fontified t)) . 2637) (undo-tree-id631 . 1)) (26678 35811 657291 964000) 0 nil])
+([nil nil ((2936 . 2936) (2936 . 2937) (2935 . 2935) (2935 . 2936) (#("0.0001" 0 6 (fontified t)) . 2935) (undo-tree-id180 . -5) (undo-tree-id181 . -5) (undo-tree-id182 . -5) (undo-tree-id183 . -5) (undo-tree-id184 . -5) (undo-tree-id185 . -6) (undo-tree-id186 . -6) 2940) ((2935 . 2941) (#("(" 0 1 (fontified nil)) . 2935) (undo-tree-id190 . -1) (undo-tree-id191 . -1) (undo-tree-id192 . -1) (#(")" 0 1 (fontified t)) . 2936)) (26678 35165 653903 159000) 0 nil])
+([nil nil ((2937 . 2938)) ((#("
+" 0 1 (fontified t)) . 2937) (undo-tree-id642 . -1) (undo-tree-id643 . -1) (undo-tree-id644 . -1) (undo-tree-id645 . -1) (undo-tree-id646 . -1) (undo-tree-id647 . -1) (undo-tree-id648 . -1) (undo-tree-id649 . -1) (undo-tree-id650 . -1) (undo-tree-id651 . -1) (undo-tree-id652 . -1)) (26679 8766 618840 595000) 0 nil])
+nil
+nil
+([nil nil ((2938 . 2939)) ((#("
+" 0 1 (fontified t)) . 2938) (undo-tree-id637 . -1) (undo-tree-id638 . -1) (undo-tree-id639 . -1) (undo-tree-id640 . -1) (undo-tree-id641 . -1)) (26679 8766 618761 257000) 0 nil])
+nil
